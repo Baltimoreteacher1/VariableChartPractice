@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Variable City is a premium HTML learning game that teaches independent and dependent variables to 6th-grade students." />
+  <title>Variable City</title>
+  <style>
+    :root{
+      --bg:#f4fbff;
+      --bg-2:#e5f2ff;
+      --panel:#ffffff;
+      --panel-2:#edf6ff;
+      --line:rgba(53,112,179,0.14);
+      --text:#102541;
+      --muted:#5f7795;
+      --accent:#1f9dff;
+      --accent-2:#64e1bf;
+      --accent-3:#ffd36e;
+      --danger:#ff7f8f;
+      --shadow:0 30px 80px rgba(64,118,177,0.14);
+      --radius-xl:32px;
+      --radius-lg:24px;
+      --radius-md:18px;
+      --font-ui:"Aptos","Segoe UI",sans-serif;
+      --font-display:"Aptos Display","Trebuchet MS",sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family:var(--font-ui);
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(100,225,191,0.2), transparent 22%),
+        radial-gradient(circle at 90% 8%, rgba(31,157,255,0.18), transparent 24%),
+        linear-gradient(180deg, #fbfeff 0%, var(--bg) 42%, var(--bg-2) 100%);
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(16,37,65,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,37,65,0.03) 1px, transparent 1px);
+      background-size:32px 32px;
+      mask-image:linear-gradient(180deg, transparent, black 10%, black 90%, transparent);
+    }
+
+    .app{
+      position:relative;
+      width:min(1380px, calc(100% - 28px));
+      margin:0 auto;
+      padding:24px 0 42px;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:var(--radius-xl);
+      border:1px solid var(--line);
+      background:linear-gradient(145deg, rgba(255,255,255,0.95), rgba(234,245,255,0.98));
+      box-shadow:var(--shadow);
+      padding:28px;
+      min-height:240px;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      right:-40px;
+      top:14px;
+      width:310px;
+      height:310px;
+      border-radius:30px;
+      background:
+        linear-gradient(145deg, rgba(100,225,191,0.28), rgba(31,157,255,0.18)),
+        radial-gradient(circle at 34% 28%, rgba(255,255,255,0.78), transparent 32%);
+      transform:perspective(900px) rotateY(-22deg) rotateX(9deg);
+      border:1px solid rgba(255,255,255,0.5);
+      box-shadow:0 40px 70px rgba(74,133,198,0.16);
+      animation:heroFloat 6s ease-in-out infinite;
+    }
+
+    .hero-grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:22px;
+      align-items:center;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(100,225,191,0.14);
+      border:1px solid rgba(100,225,191,0.4);
+      color:#12775e;
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+
+    h1{
+      margin:16px 0 10px;
+      font-family:var(--font-display);
+      font-size:clamp(42px, 8vw, 82px);
+      letter-spacing:-0.06em;
+      line-height:.9;
+      max-width:8ch;
+    }
+
+    .hero-copy{
+      max-width:58ch;
+      margin:0;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.6;
+    }
+
+    .hero-actions,.hero-stats,.mission-tags,.footer-tags,.scene-kpi{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .hero-actions{margin-top:20px}
+
+    .chip,.stat,.tag{
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.72);
+      backdrop-filter:blur(16px);
+    }
+
+    .stat{
+      padding:16px;
+      min-width:120px;
+      flex:1;
+    }
+
+    .stat-label{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    .stat-value{
+      display:block;
+      margin-top:6px;
+      font-size:30px;
+      font-weight:800;
+    }
+
+    .main-grid{
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:22px;
+      margin-top:22px;
+      align-items:start;
+    }
+
+    .sidebar{
+      display:grid;
+      gap:22px;
+      position:sticky;
+      top:18px;
+    }
+
+    .panel{
+      position:relative;
+      overflow:hidden;
+      border-radius:var(--radius-lg);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,0.97), rgba(241,248,255,0.98));
+      box-shadow:var(--shadow);
+    }
+
+    .panel-inner{padding:22px}
+    .panel h2,.panel h3,.panel h4{margin:0 0 12px;letter-spacing:-0.02em}
+
+    .small{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .progress-shell{
+      margin-top:14px;
+      height:12px;
+      border-radius:999px;
+      background:rgba(35,92,152,0.09);
+      overflow:hidden;
+    }
+
+    .progress-fill{
+      height:100%;
+      background:linear-gradient(90deg, var(--accent-2), var(--accent));
+      transition:width .35s ease;
+    }
+
+    .mission-list{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .mission{
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,0.92), rgba(235,244,255,0.92));
+      transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      cursor:pointer;
+    }
+
+    .mission:hover,.mission.active{
+      transform:translateY(-2px);
+      border-color:rgba(31,157,255,0.34);
+      box-shadow:0 16px 28px rgba(74,133,198,0.12);
+    }
+
+    .mission.locked{
+      opacity:.5;
+      cursor:not-allowed;
+    }
+
+    .mission-title{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      margin-bottom:8px;
+      font-size:16px;
+      font-weight:800;
+    }
+
+    .screen-stack,.overview-grid,.lesson-grid,.footer-grid{
+      display:grid;
+      gap:22px;
+    }
+
+    .overview-grid{
+      grid-template-columns:1.08fr .92fr;
+    }
+
+    .city-stage{
+      display:grid;
+      grid-template-columns:1fr 320px;
+      gap:18px;
+    }
+
+    .scene{
+      position:relative;
+      min-height:430px;
+      overflow:hidden;
+      border-radius:24px;
+      border:1px solid rgba(83,145,213,0.18);
+      background:
+        radial-gradient(circle at 50% 14%, rgba(255,247,216,0.95), transparent 18%),
+        linear-gradient(180deg, #88cbff 0%, #c4ecff 34%, #dff8ff 60%, #f7fdff 100%);
+      perspective:1200px;
+      transform-style:preserve-3d;
+    }
+
+    .sun-glow{
+      position:absolute;
+      top:13%;
+      right:11%;
+      width:130px;
+      height:130px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,240,186,1), rgba(255,211,110,0.45) 48%, rgba(255,211,110,0) 74%);
+      animation:sunPulse 4s ease-in-out infinite;
+    }
+
+    .cloud{
+      position:absolute;
+      top:18%;
+      left:-180px;
+      width:138px;
+      height:52px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.82);
+      box-shadow:36px 9px 0 8px rgba(255,255,255,0.72), 82px -3px 0 0 rgba(255,255,255,0.72);
+      animation:cloudDrift 18s linear infinite;
+    }
+
+    .cloud.two{
+      top:28%;
+      transform:scale(.86);
+      opacity:.82;
+      animation-duration:24s;
+      animation-delay:-8s;
+    }
+
+    .scene-grid{
+      position:absolute;
+      inset:auto -6% 0 -6%;
+      height:45%;
+      background:
+        linear-gradient(rgba(54,132,181,0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(54,132,181,0.22) 1px, transparent 1px);
+      background-size:48px 48px;
+      transform:rotateX(72deg) translateY(115px);
+      transform-origin:bottom center;
+      opacity:.5;
+      animation:gridDrift 10s linear infinite;
+    }
+
+    .cityline{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:76px;
+      height:190px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-evenly;
+      padding:0 18px;
+      gap:12px;
+    }
+
+    .tower{
+      width:14%;
+      min-width:60px;
+      border-radius:18px 18px 0 0;
+      border:1px solid rgba(255,255,255,0.56);
+      background:linear-gradient(180deg, rgba(72,166,255,0.92), rgba(170,232,255,0.7));
+      box-shadow:0 16px 28px rgba(71,141,206,0.16);
+      position:relative;
+      overflow:hidden;
+      transform:translateZ(24px);
+      animation:buildingRise 2.6s ease both;
+    }
+
+    .tower::after{
+      content:"";
+      position:absolute;
+      inset:10px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.2), transparent 20%),
+        linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px);
+      background-size:18px 18px;
+      opacity:.6;
+    }
+
+    .tower:nth-child(2){animation-delay:.12s}
+    .tower:nth-child(3){animation-delay:.24s}
+    .tower:nth-child(4){animation-delay:.36s}
+    .tower:nth-child(5){animation-delay:.48s}
+
+    .light-trail{
+      position:absolute;
+      left:-20%;
+      bottom:100px;
+      width:30%;
+      height:4px;
+      border-radius:999px;
+      background:linear-gradient(90deg, transparent, rgba(31,157,255,0.8), rgba(100,225,191,0.95), transparent);
+      filter:blur(1px);
+      animation:trailSweep 5s ease-in-out infinite;
+    }
+
+    .avatar{
+      position:absolute;
+      left:8%;
+      bottom:58px;
+      width:132px;
+      height:172px;
+      transform:translateZ(84px);
+      animation:pilotBounce 3.2s ease-in-out infinite;
+    }
+
+    .avatar .head,.avatar .body,.avatar .arm,.avatar .leg{
+      position:absolute;
+      background:linear-gradient(180deg, #64e1bf, #49c8ff);
+      box-shadow:0 0 18px rgba(73,200,255,0.2);
+    }
+
+    .avatar .head{width:54px;height:54px;border-radius:50%;left:39px;top:0}
+    .avatar .body{width:72px;height:78px;border-radius:26px;left:30px;top:48px}
+    .avatar .arm{width:20px;height:74px;border-radius:12px;top:58px}
+    .avatar .arm.left{left:8px;transform:rotate(20deg)}
+    .avatar .arm.right{right:8px;transform:rotate(-20deg)}
+    .avatar .leg{width:22px;height:72px;border-radius:12px;top:112px}
+    .avatar .leg.left{left:39px}
+    .avatar .leg.right{right:39px}
+
+    .drone{
+      position:absolute;
+      right:10%;
+      top:20%;
+      width:120px;
+      height:66px;
+      transform:translateZ(120px) rotate(-8deg);
+      animation:hoverFloat 4s ease-in-out infinite;
+    }
+
+    .drone::before,.drone::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      border:1px solid rgba(100,225,191,0.42);
+      background:linear-gradient(145deg, rgba(100,225,191,0.42), rgba(31,157,255,0.16));
+    }
+
+    .drone::after{
+      inset:18px 10px;
+      background:linear-gradient(145deg, rgba(255,255,255,0.4), rgba(255,255,255,0));
+    }
+
+    .scene-label{
+      position:absolute;
+      top:18px;
+      left:18px;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.8);
+      background:rgba(255,255,255,0.72);
+      color:#1b4470;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .scene-kpi{
+      position:absolute;
+      right:18px;
+      bottom:18px;
+    }
+
+    .control-card,.feedback,.mini-item,.output{
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.8);
+    }
+
+    .control-card{padding:20px}
+
+    .slider-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:end;
+      margin-bottom:10px;
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color:var(--accent);
+    }
+
+    .axis{
+      display:flex;
+      justify-content:space-between;
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .output-grid,.choice-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .output-grid{grid-template-columns:repeat(3, minmax(0,1fr));margin-top:16px}
+    .choice-grid{grid-template-columns:repeat(2, minmax(0,1fr));margin-top:12px}
+
+    .output{padding:14px}
+    .output span{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .output strong{
+      display:block;
+      margin-top:6px;
+      font-size:24px;
+    }
+
+    .graph{
+      margin-top:14px;
+      height:220px;
+      border-radius:18px;
+      border:1px solid rgba(53,112,179,0.12);
+      background:
+        linear-gradient(rgba(16,37,65,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,37,65,0.08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(31,157,255,0.08), rgba(100,225,191,0.08));
+      background-size:36px 36px, 36px 36px, 100% 100%;
+      overflow:hidden;
+    }
+
+    .graph svg{width:100%;height:100%}
+
+    .quiz-card,.future-card,.insight-card{
+      padding:18px;
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.78);
+    }
+
+    .feedback{
+      margin-top:16px;
+      min-height:62px;
+      padding:14px 16px;
+      line-height:1.45;
+    }
+
+    .feedback.good{
+      border-color:rgba(100,225,191,0.4);
+      background:rgba(100,225,191,0.18);
+    }
+
+    .feedback.bad{
+      border-color:rgba(255,127,143,0.34);
+      background:rgba(255,127,143,0.14);
+    }
+
+    .mini-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .mini-item{
+      padding:14px;
+      line-height:1.45;
+    }
+
+    .mini-item strong{
+      display:block;
+      margin-bottom:4px;
+    }
+
+    .tag{
+      padding:8px 11px;
+      font-size:12px;
+      font-weight:800;
+      color:#1a4470;
+    }
+
+    button{
+      border:0;
+      cursor:pointer;
+      padding:14px 16px;
+      border-radius:16px;
+      font:800 15px var(--font-ui);
+      color:var(--text);
+      background:linear-gradient(145deg, rgba(31,157,255,0.18), rgba(100,225,191,0.16));
+      border:1px solid rgba(53,112,179,0.12);
+      box-shadow:0 14px 30px rgba(74,133,198,0.1);
+      transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+
+    button:hover:not(:disabled){
+      transform:translateY(-2px);
+      box-shadow:0 20px 34px rgba(74,133,198,0.14);
+    }
+
+    button:disabled{opacity:.56;cursor:not-allowed}
+    .primary{background:linear-gradient(145deg, rgba(100,225,191,0.32), rgba(31,157,255,0.22))}
+    .ghost{background:rgba(255,255,255,0.86)}
+    .danger{background:linear-gradient(145deg, rgba(255,127,143,0.24), rgba(255,211,110,0.18))}
+
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
+    @keyframes heroFloat{
+      0%,100%{transform:perspective(900px) rotateY(-22deg) rotateX(9deg) translateY(0)}
+      50%{transform:perspective(900px) rotateY(-18deg) rotateX(7deg) translateY(-10px)}
+    }
+    @keyframes hoverFloat{
+      0%,100%{transform:translateZ(120px) translateY(0) rotate(-8deg)}
+      50%{transform:translateZ(120px) translateY(-14px) rotate(-4deg)}
+    }
+    @keyframes pilotBounce{
+      0%,100%{transform:translateZ(84px) translateY(0)}
+      50%{transform:translateZ(84px) translateY(-8px)}
+    }
+    @keyframes cloudDrift{
+      from{transform:translateX(0)}
+      to{transform:translateX(calc(100vw + 260px))}
+    }
+    @keyframes gridDrift{
+      from{transform:rotateX(72deg) translateY(115px) translateX(0)}
+      to{transform:rotateX(72deg) translateY(115px) translateX(-48px)}
+    }
+    @keyframes buildingRise{
+      from{transform:translateZ(24px) translateY(46px) scaleY(.72);opacity:0}
+      to{transform:translateZ(24px) translateY(0) scaleY(1);opacity:1}
+    }
+    @keyframes trailSweep{
+      0%{transform:translateX(0) scaleX(.7);opacity:0}
+      15%{opacity:1}
+      65%{opacity:1}
+      100%{transform:translateX(420%) scaleX(1.2);opacity:0}
+    }
+    @keyframes sunPulse{
+      0%,100%{transform:scale(1);opacity:.92}
+      50%{transform:scale(1.08);opacity:1}
+    }
+
+    @media (max-width:1180px){
+      .hero-grid,.main-grid,.overview-grid,.city-stage,.lesson-grid,.footer-grid{grid-template-columns:1fr}
+      .sidebar{position:static}
+    }
+
+    @media (max-width:720px){
+      .app{width:min(100% - 18px, 1380px)}
+      .hero{padding:20px}
+      h1{font-size:50px}
+      .choice-grid,.output-grid{grid-template-columns:1fr}
+      .cityline{padding:0 8px}
+      .tower{min-width:42px}
+    }
+  </style>
+</head>
+<body>
+  <div id="liveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <main class="app" id="app"></main>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "variable-city-save-v2";
+    const MISSIONS = [
+      {
+        id: "solar-garden",
+        district: "Neon Greenhouse",
+        title: "Solar Garden Lift-Off",
+        description: "Control sunlight time and watch plant height respond.",
+        independentLabel: "Hours of sunlight",
+        dependentLabel: "Plant height",
+        unitIndependent: "hours",
+        unitDependent: "cm",
+        min: 1,
+        max: 10,
+        step: 1,
+        base: 8,
+        factor: 3,
+        heroMetric: "plants powered",
+        narrative: "Mayor Nova needs one clean experiment to relight the greenhouse dome.",
+        quiz: [
+          { id: "q1", prompt: "Which variable is independent?", choices: ["Hours of sunlight", "Plant height", "Both are dependent", "Neither"], answer: 0, explain: "The independent variable is the one you change on purpose." },
+          { id: "q2", prompt: "Which variable changes because of the sunlight?", choices: ["Plant height", "The scientist's name", "The district title", "The graph paper"], answer: 0, explain: "Plant height depends on the sunlight amount." }
+        ]
+      },
+      {
+        id: "rocket-ramp",
+        district: "Skyport Seven",
+        title: "Rocket Scooter Test",
+        description: "Change launch power and see jump distance react.",
+        independentLabel: "Launch power",
+        dependentLabel: "Jump distance",
+        unitIndependent: "%",
+        unitDependent: "m",
+        min: 10,
+        max: 100,
+        step: 10,
+        base: 2,
+        factor: 0.14,
+        heroMetric: "meters cleared",
+        narrative: "The delivery squad cannot test new ramps until your data is stable.",
+        quiz: [
+          { id: "q1", prompt: "What is the dependent variable?", choices: ["Launch power", "Jump distance", "The scooter color", "The tester name"], answer: 1, explain: "Jump distance changes because launch power changes." },
+          { id: "q2", prompt: "What happens if launch power drops in this model?", choices: ["Distance probably drops too", "Distance becomes independent", "Nothing can change", "Power becomes the dependent variable"], answer: 0, explain: "The output reacts to the input." }
+        ]
+      },
+      {
+        id: "smoothie-lab",
+        district: "Flavor Engine",
+        title: "Smoothie Lab Rush",
+        description: "Adjust puree cups and track servings created.",
+        independentLabel: "Cups of fruit puree",
+        dependentLabel: "Smoothie servings",
+        unitIndependent: "cups",
+        unitDependent: "servings",
+        min: 1,
+        max: 8,
+        step: 1,
+        base: 1,
+        factor: 2,
+        heroMetric: "snacks served",
+        narrative: "The robotics club placed a huge snack order and the lab needs your experiment.",
+        quiz: [
+          { id: "q1", prompt: "Which variable does the chef control?", choices: ["Smoothie servings", "Fruit puree cups", "Student appetite", "Music volume"], answer: 1, explain: "The chef controls how many cups get added." },
+          { id: "q2", prompt: "Why are servings dependent?", choices: ["They are the cause", "They change after the cups change", "They never change", "They only label the graph"], answer: 1, explain: "Servings are the effect, not the cause." }
+        ]
+      },
+      {
+        id: "rain-lab",
+        district: "Cloud Arcade",
+        title: "Rain Tank Rescue",
+        description: "Control rain simulation minutes and monitor tank level.",
+        independentLabel: "Minutes of rainfall",
+        dependentLabel: "Tank water level",
+        unitIndependent: "min",
+        unitDependent: "L",
+        min: 2,
+        max: 12,
+        step: 2,
+        base: 5,
+        factor: 4,
+        heroMetric: "liters stored",
+        narrative: "Cloud Arcade's emergency tank must pass one final test before tomorrow's storm drill.",
+        quiz: [
+          { id: "q1", prompt: "Which variable depends on rainfall time?", choices: ["Tank water level", "Rainfall minutes", "The weather badge", "The city zip code"], answer: 0, explain: "The water level changes because the rainfall time changes." },
+          { id: "q2", prompt: "Best clue for spotting an independent variable?", choices: ["It is what gets changed on purpose", "It is always the result", "It must be the biggest number", "It always uses liters"], answer: 0, explain: "The input you control is the independent variable." }
+        ]
+      }
+    ];
+
+    const FUTURE_NODES = [
+      "Data-driven mission schema for new cities and standards",
+      "Persistent mastery profile and unlock system",
+      "Reusable graph engine for later nonlinear units",
+      "Ready for teacher dashboards and progress export",
+      "Scene system can grow into more districts and endings"
+    ];
+
+    const state = {
+      selectedMissionId: MISSIONS[0].id,
+      sliderValue: MISSIONS[0].min,
+      answers: {},
+      stars: 0,
+      mastery: 0,
+      completed: {},
+      totalCorrect: 0,
+      message: "Choose a mission, move the control, and watch the city react.",
+      messageTone: ""
+    };
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    function announce(text){
+      const node = $("#liveRegion");
+      node.textContent = "";
+      requestAnimationFrame(() => { node.textContent = text; });
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) Object.assign(state, JSON.parse(raw));
+      }catch(err){
+        console.warn("Load skipped", err);
+      }
+    }
+
+    function saveState(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }catch(err){
+        console.warn("Save skipped", err);
+      }
+    }
+
+    function getMission(id){
+      return MISSIONS.find((mission) => mission.id === id) || MISSIONS[0];
+    }
+
+    function currentMission(){
+      return getMission(state.selectedMissionId);
+    }
+
+    function computeDependent(mission, independent){
+      return Number((mission.base + independent * mission.factor).toFixed(1));
+    }
+
+    function missionUnlocked(index){
+      return index === 0 || Object.keys(state.completed).length >= index;
+    }
+
+    function missionProgress(){
+      return Math.round((Object.keys(state.completed).length / MISSIONS.length) * 100);
+    }
+
+    function currentOutputs(){
+      const mission = currentMission();
+      const independent = Number(state.sliderValue);
+      const dependent = computeDependent(mission, independent);
+      const efficiency = Math.round((dependent / (independent || 1)) * 10) / 10;
+      return { mission, independent, dependent, efficiency };
+    }
+
+    function selectMission(id){
+      state.selectedMissionId = id;
+      state.sliderValue = currentMission().min;
+      state.message = currentMission().narrative;
+      state.messageTone = "";
+      saveState();
+      render();
+      announce(currentMission().title + " loaded");
+    }
+
+    function updateSlider(value){
+      state.sliderValue = Number(value);
+      const { mission, independent, dependent } = currentOutputs();
+      state.message = mission.independentLabel + " is set to " + independent + " " + mission.unitIndependent + ". " + mission.dependentLabel + " responds at " + dependent + " " + mission.unitDependent + ".";
+      state.messageTone = "";
+      saveState();
+      render();
+    }
+
+    function answerQuestion(questionIndex, answerIndex){
+      const mission = currentMission();
+      const question = mission.quiz[questionIndex];
+      const key = mission.id + ":" + question.id;
+      if(state.answers[key] != null) return;
+
+      state.answers[key] = answerIndex;
+      if(answerIndex === question.answer){
+        state.totalCorrect += 1;
+        state.stars += 15;
+        state.mastery = Math.min(100, state.mastery + 12);
+        state.message = "Correct. " + question.explain;
+        state.messageTone = "good";
+      }else{
+        state.mastery = Math.max(0, state.mastery - 4);
+        state.message = "Not quite. " + question.explain;
+        state.messageTone = "bad";
+      }
+
+      const allAnswered = mission.quiz.every((item) => state.answers[mission.id + ":" + item.id] != null);
+      const allCorrect = mission.quiz.every((item) => state.answers[mission.id + ":" + item.id] === item.answer);
+
+      if(allAnswered && allCorrect && !state.completed[mission.id]){
+        state.completed[mission.id] = true;
+        state.stars += 35;
+        state.mastery = Math.min(100, state.mastery + 18);
+        state.message = mission.title + " complete. District stabilized and the next mission is open.";
+        state.messageTone = "good";
+      }
+
+      saveState();
+      render();
+    }
+
+    function resetProgress(){
+      state.selectedMissionId = MISSIONS[0].id;
+      state.sliderValue = MISSIONS[0].min;
+      state.answers = {};
+      state.stars = 0;
+      state.mastery = 0;
+      state.completed = {};
+      state.totalCorrect = 0;
+      state.message = "Progress reset. Start again from the first district.";
+      state.messageTone = "";
+      saveState();
+      render();
+    }
+
+    function graphPath(mission){
+      const xs = [];
+      for(let x = mission.min; x <= mission.max; x += mission.step) xs.push(x);
+      const minY = computeDependent(mission, mission.min);
+      const maxY = computeDependent(mission, mission.max);
+      return xs.map((x, index) => {
+        const y = computeDependent(mission, x);
+        const px = 30 + (index / Math.max(xs.length - 1, 1)) * 290;
+        const py = 180 - ((y - minY) / Math.max(maxY - minY, 1)) * 130;
+        return (index === 0 ? "M" : "L") + px.toFixed(1) + " " + py.toFixed(1);
+      }).join(" ");
+    }
+
+    function graphDot(mission){
+      const steps = (mission.max - mission.min) / mission.step;
+      const minY = computeDependent(mission, mission.min);
+      const maxY = computeDependent(mission, mission.max);
+      const x = 30 + (((state.sliderValue - mission.min) / mission.step) / Math.max(steps, 1)) * 290;
+      const value = computeDependent(mission, state.sliderValue);
+      const y = 180 - ((value - minY) / Math.max(maxY - minY, 1)) * 130;
+      return { x, y };
+    }
+
+    function render(){
+      const root = $("#app");
+      const mission = currentMission();
+      const { independent, dependent, efficiency } = currentOutputs();
+      const progress = missionProgress();
+      const dot = graphDot(mission);
+
+      root.innerHTML = `
+        <section class="hero">
+          <div class="hero-grid">
+            <div>
+              <div class="eyebrow">Premium 6th-grade math game</div>
+              <h1>Variable City</h1>
+              <p class="hero-copy">Learn independent and dependent variables by running city experiments. Change one variable, watch the other react, and clear each district through missions and quick concept checks.</p>
+              <div class="hero-actions">
+                <button class="primary" id="enterMissionBtn">Enter ${mission.district}</button>
+                <button class="ghost" id="resetBtn">Reset Progress</button>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <div class="stat">
+                <div class="stat-label">Mastery</div>
+                <span class="stat-value">${state.mastery}%</span>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Stars</div>
+                <span class="stat-value">${state.stars}</span>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Districts</div>
+                <span class="stat-value">${Object.keys(state.completed).length}/${MISSIONS.length}</span>
+              </div>
+              <div style="flex-basis:100%">
+                <div class="progress-shell"><div class="progress-fill" style="width:${progress}%"></div></div>
+                <div class="small" style="margin-top:8px">Campaign completion ${progress}%</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="main-grid">
+          <aside class="sidebar">
+            <section class="panel">
+              <div class="panel-inner">
+                <h3>Mission Select</h3>
+                <div class="small">One district at a time. Clear a mission by getting both concept checks right.</div>
+                <div class="mission-list">
+                  ${MISSIONS.map((item, index) => `
+                    <article class="mission ${item.id === mission.id ? "active" : ""} ${missionUnlocked(index) ? "" : "locked"}" data-mission="${item.id}">
+                      <div class="mission-title">
+                        <span>${item.title}</span>
+                        <span>${state.completed[item.id] ? "Cleared" : missionUnlocked(index) ? "Ready" : "Locked"}</span>
+                      </div>
+                      <div class="small">${item.description}</div>
+                    </article>
+                  `).join("")}
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-inner">
+                <h3>Quick Memory Trick</h3>
+                <div class="mini-list">
+                  <div class="mini-item"><strong>Independent</strong>You change it. It is the cause or input.</div>
+                  <div class="mini-item"><strong>Dependent</strong>It reacts. It is the effect or output.</div>
+                  <div class="mini-item"><strong>Graph clue</strong>X-axis is usually the independent variable. Y-axis is the dependent one.</div>
+                </div>
+              </div>
+            </section>
+          </aside>
+
+          <section class="screen-stack">
+            <section class="overview-grid">
+              <section class="panel">
+                <div class="panel-inner">
+                  <h2>${mission.title}</h2>
+                  <div class="small">${mission.narrative}</div>
+                  <div class="city-stage" style="margin-top:16px">
+                    <div class="scene">
+                      <div class="sun-glow"></div>
+                      <div class="cloud"></div>
+                      <div class="cloud two"></div>
+                      <div class="scene-label">${mission.district}</div>
+                      <div class="scene-grid"></div>
+                      <div class="light-trail"></div>
+                      <div class="cityline">
+                        <div class="tower" style="height:${118 + independent * 4}px"></div>
+                        <div class="tower" style="height:${92 + dependent * 2}px"></div>
+                        <div class="tower" style="height:${136 + independent * 3}px"></div>
+                        <div class="tower" style="height:${74 + dependent * 2.3}px"></div>
+                        <div class="tower" style="height:${108 + independent * 2}px"></div>
+                      </div>
+                      <div class="avatar">
+                        <div class="head"></div>
+                        <div class="body"></div>
+                        <div class="arm left"></div>
+                        <div class="arm right"></div>
+                        <div class="leg left"></div>
+                        <div class="leg right"></div>
+                      </div>
+                      <div class="drone"></div>
+                      <div class="scene-kpi">
+                        <div class="tag">Independent: ${independent} ${mission.unitIndependent}</div>
+                        <div class="tag">Dependent: ${dependent} ${mission.unitDependent}</div>
+                      </div>
+                    </div>
+
+                    <div class="control-card">
+                      <h3>Experiment Control</h3>
+                      <div class="small">Move the slider to change the independent variable. Watch the scene and outputs update live.</div>
+                      <div style="margin-top:16px">
+                        <div class="slider-row">
+                          <div>
+                            <div class="tag">${mission.independentLabel}</div>
+                            <strong style="font-size:30px">${independent} ${mission.unitIndependent}</strong>
+                          </div>
+                          <div style="text-align:right">
+                            <div class="tag">${mission.dependentLabel}</div>
+                            <strong style="font-size:30px">${dependent} ${mission.unitDependent}</strong>
+                          </div>
+                        </div>
+                        <input id="variableSlider" type="range" min="${mission.min}" max="${mission.max}" step="${mission.step}" value="${independent}" />
+                        <div class="axis">
+                          <span>${mission.min} ${mission.unitIndependent}</span>
+                          <span>${mission.max} ${mission.unitIndependent}</span>
+                        </div>
+                      </div>
+                      <div class="output-grid">
+                        <div class="output">
+                          <span>Cause</span>
+                          <strong>${mission.independentLabel}</strong>
+                        </div>
+                        <div class="output">
+                          <span>Effect</span>
+                          <strong>${mission.dependentLabel}</strong>
+                        </div>
+                        <div class="output">
+                          <span>Response ratio</span>
+                          <strong>${efficiency}</strong>
+                        </div>
+                      </div>
+                      <div class="feedback ${state.messageTone}">${state.message}</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-inner">
+                  <h3>Reaction Graph</h3>
+                  <div class="small">What you change belongs on the x-axis. What reacts belongs on the y-axis.</div>
+                  <div class="graph">
+                    <svg viewBox="0 0 360 220" role="img" aria-label="Mission graph">
+                      <line x1="28" y1="182" x2="330" y2="182" stroke="rgba(16,37,65,0.45)" stroke-width="2"></line>
+                      <line x1="28" y1="20" x2="28" y2="182" stroke="rgba(16,37,65,0.45)" stroke-width="2"></line>
+                      <path d="${graphPath(mission)}" fill="none" stroke="url(#lineGlow)" stroke-width="5" stroke-linecap="round"></path>
+                      <circle cx="${dot.x}" cy="${dot.y}" r="8" fill="#ffd36e"></circle>
+                      <defs>
+                        <linearGradient id="lineGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#64e1bf"></stop>
+                          <stop offset="100%" stop-color="#1f9dff"></stop>
+                        </linearGradient>
+                      </defs>
+                      <text x="162" y="212" fill="#57718f" font-size="13">${mission.independentLabel}</text>
+                      <text x="-128" y="14" fill="#57718f" font-size="13" transform="rotate(-90)">${mission.dependentLabel}</text>
+                    </svg>
+                  </div>
+
+                  <div class="quiz-card" style="margin-top:18px">
+                    <h3>Concept Check</h3>
+                    ${mission.quiz.map((question, questionIndex) => {
+                      const key = mission.id + ":" + question.id;
+                      const answered = state.answers[key];
+                      return `
+                        <div style="margin-top:${questionIndex ? 18 : 0}px">
+                          <h4>${questionIndex + 1}. ${question.prompt}</h4>
+                          <div class="choice-grid">
+                            ${question.choices.map((choice, answerIndex) => `
+                              <button data-question="${questionIndex}" data-answer="${answerIndex}" ${answered != null ? "disabled" : ""}>${choice}</button>
+                            `).join("")}
+                          </div>
+                          <div class="small" style="margin-top:8px">${answered == null ? "Pick the best answer." : answered === question.answer ? "Answered correctly." : "Answered. Review the feedback panel."}</div>
+                        </div>
+                      `;
+                    }).join("")}
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <section class="footer-grid">
+              <section class="panel">
+                <div class="panel-inner">
+                  <h3>Mission Insight</h3>
+                  <div class="insight-card">
+                    <div class="footer-tags">
+                      <span class="tag">Independent = input</span>
+                      <span class="tag">Dependent = output</span>
+                    </div>
+                    <div class="mini-list">
+                      <div class="mini-item"><strong>What you control</strong>${mission.independentLabel} is changed on purpose during the experiment.</div>
+                      <div class="mini-item"><strong>What reacts</strong>${mission.dependentLabel} changes because the independent variable changed.</div>
+                      <div class="mini-item"><strong>How to remember it</strong>Independent starts the action. Dependent depends on the action.</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-inner">
+                  <h3>Future Iterations Embedded</h3>
+                  <div class="future-card">
+                    <div class="small">This build is lighter and clearer on the surface, but still structured like a scalable product rather than a one-screen demo.</div>
+                    <div class="mini-list">
+                      ${FUTURE_NODES.map((item) => `<div class="mini-item"><strong>Roadmap node</strong>${item}</div>`).join("")}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </section>
+          </section>
+        </section>
+      `;
+
+      bindEvents();
+      saveState();
+    }
+
+    function bindEvents(){
+      const slider = $("#variableSlider");
+      if(slider) slider.addEventListener("input", (event) => updateSlider(event.target.value));
+
+      const reset = $("#resetBtn");
+      if(reset) reset.addEventListener("click", resetProgress);
+
+      const enter = $("#enterMissionBtn");
+      if(enter) enter.addEventListener("click", () => {
+        const scene = $(".scene");
+        if(scene) scene.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      $$(".mission").forEach((node, index) => {
+        node.addEventListener("click", () => {
+          if(!missionUnlocked(index)) return;
+          selectMission(node.dataset.mission);
+        });
+      });
+
+      $$("[data-question]").forEach((node) => {
+        node.addEventListener("click", () => {
+          answerQuestion(Number(node.dataset.question), Number(node.dataset.answer));
+        });
+      });
+    }
+
+    loadState();
+    render();
+  </script>
+</body>
+</html>
