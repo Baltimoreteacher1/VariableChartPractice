@@ -1,1553 +1,1504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Variable City | Advanced Relationships & Graphs</title>
-  <style>
-    :root{
-      --navy:#263238;
-      --teal:#009688;
-      --coral:#FF7043;
-      --paper:#FFFDE7;
-      --sand:#F5F5F5;
-      --white:#FFFFFF;
-      --mist:#EAF7F5;
-      --line:#D7E4E1;
-      --ink:#243238;
-      --muted:#50636A;
-      --success:#2E7D32;
-      --success-bg:#E8F5E9;
-      --warn:#AD5A00;
-      --warn-bg:#FFF3E0;
-      --shadow:0 18px 46px rgba(38,50,56,.10);
-      --radius:18px;
-      --hud:72px;
-      --fast:.18s ease;
-      --med:.28s ease;
-      --bar-h:0px;
-      --point-x:0px;
-      --point-y:0px;
-      --celebrate-scale:1;
-    }
-
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:Montserrat,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:var(--ink);
-      background:
-        radial-gradient(circle at 20% 20%, rgba(255,112,67,.08), transparent 18%),
-        radial-gradient(circle at 80% 10%, rgba(0,150,136,.08), transparent 20%),
-        radial-gradient(var(--line) 1px, transparent 1px),
-        var(--paper);
-      background-size:auto,auto,22px 22px,auto;
-      min-height:100vh;
-    }
-
-    .sr-only{
-      position:absolute!important;
-      width:1px;height:1px;
-      padding:0;margin:-1px;
-      overflow:hidden;clip:rect(0,0,0,0);
-      white-space:nowrap;border:0;
-    }
-
-    .app-shell{
-      max-width:1240px;
-      margin:0 auto;
-      padding:0 18px 28px;
-    }
-
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      height:var(--hud);
-      background:rgba(255,253,231,.95);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(38,50,56,.10);
-      display:flex;
-      align-items:center;
-    }
-
-    .topbar-inner{
-      max-width:1240px;
-      width:100%;
-      margin:0 auto;
-      padding:0 18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
-
-    .brand-mark{
-      width:42px;height:42px;
-      border-radius:14px;
-      display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--navy),var(--teal));
-      color:#fff;
-      font-weight:800;
-      box-shadow:var(--shadow);
-      flex:0 0 auto;
-    }
-
-    .brand-copy h1{
-      margin:0;
-      font-size:1rem;
-      line-height:1.05;
-      color:var(--navy);
-    }
-
-    .brand-copy p{
-      margin:3px 0 0;
-      font-size:.83rem;
-      color:var(--muted);
-      font-family:"Century Gothic",system-ui,sans-serif;
-    }
-
-    .status-strip{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .pill{
-      border:1px solid rgba(38,50,56,.12);
-      background:var(--white);
-      color:var(--navy);
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:.9rem;
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    .pill strong{color:var(--coral)}
-    .pill--success{
-      background:var(--success-bg);
-      border-color:rgba(46,125,50,.18);
-      color:var(--success);
-      transform:scale(var(--celebrate-scale));
-      transition:transform .22s ease, background .22s ease;
-    }
-
-    .hero{
-      padding:20px 0 12px;
-      display:grid;
-      grid-template-columns:minmax(0,1.15fr) minmax(360px,.95fr);
-      gap:18px;
-      align-items:start;
-    }
-
-    .card{
-      background:rgba(255,255,255,.86);
-      border:1px solid rgba(38,50,56,.10);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-
-    .hero-card{
-      padding:22px 22px 18px;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      padding:7px 12px;
-      border-radius:999px;
-      background:rgba(0,150,136,.10);
-      color:var(--teal);
-      font-size:.82rem;
-      font-weight:800;
-      letter-spacing:.03em;
-      text-transform:uppercase;
-      margin-bottom:12px;
-    }
-
-    .hero h2{
-      margin:0 0 10px;
-      font-size:clamp(1.8rem,3vw,3rem);
-      line-height:1.02;
-      color:var(--navy);
-    }
-
-    .hero h2 .accent{color:var(--coral)}
-    .hero p{
-      margin:0;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.55;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:16px;
-    }
-
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      border-radius:12px;
-      padding:13px 18px;
-      font:700 .98rem/1 Montserrat,system-ui,sans-serif;
-      transition:transform var(--fast), box-shadow var(--fast), background var(--fast), border-color var(--fast);
-      box-shadow:0 10px 24px rgba(38,50,56,.08);
-    }
-
-    .btn:hover,.btn:focus-visible{transform:translateY(-1px)}
-    .btn:focus-visible{outline:3px solid rgba(0,150,136,.22); outline-offset:2px}
-    .btn--primary{background:var(--teal); color:#fff}
-    .btn--secondary{background:var(--coral); color:#fff}
-    .btn--ghost{
-      background:#fff;
-      color:var(--navy);
-      border:1px solid rgba(38,50,56,.12);
-    }
-    .btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      transform:none;
-      box-shadow:none;
-    }
-
-    .workflow-card{
-      padding:18px;
-      display:grid;
-      gap:12px;
-    }
-
-    .workflow-title{
-      margin:0;
-      font-size:1rem;
-      color:var(--navy);
-    }
-
-    .crumbs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .crumb{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      border-radius:14px;
-      padding:10px 12px;
-      background:var(--sand);
-      border:1px solid rgba(38,50,56,.08);
-      color:var(--navy);
-      font-size:.92rem;
-      font-weight:700;
-    }
-
-    .crumb.is-active{
-      background:rgba(255,112,67,.10);
-      border-color:rgba(255,112,67,.24);
-      color:var(--coral);
-    }
-
-    .main-grid{
-      display:grid;
-      grid-template-columns:minmax(0,1.1fr) minmax(320px,.72fr);
-      gap:18px;
-      align-items:start;
-    }
-
-    .panel{
-      padding:20px;
-    }
-
-    .panel-head{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:14px;
-    }
-
-    .panel-head h3{
-      margin:0;
-      color:var(--navy);
-      font-size:1.2rem;
-    }
-
-    .panel-head p{
-      margin:5px 0 0;
-      color:var(--muted);
-      font-size:.97rem;
-      line-height:1.45;
-    }
-
-    .tag-row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .tag{
-      padding:7px 10px;
-      border-radius:999px;
-      font-size:.84rem;
-      font-weight:800;
-      background:#fff;
-      border:1px solid rgba(38,50,56,.12);
-      color:var(--navy);
-    }
-
-    .tag--ind{
-      background:rgba(255,112,67,.10);
-      color:var(--coral);
-      border-color:rgba(255,112,67,.22);
-    }
-
-    .tag--dep{
-      background:rgba(0,150,136,.10);
-      color:var(--teal);
-      border-color:rgba(0,150,136,.22);
-    }
-
-    .model-grid{
-      display:grid;
-      grid-template-columns:minmax(220px,.85fr) minmax(0,1.15fr);
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .stage{
-      background:linear-gradient(180deg,#fff,var(--sand));
-      border:1px solid rgba(38,50,56,.08);
-      border-radius:16px;
-      padding:16px;
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-      gap:14px;
-      min-height:470px;
-    }
-
-    .stage-title{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .stage-title h4{
-      margin:0;
-      color:var(--navy);
-      font-size:1rem;
-    }
-
-    .light-badge{
-      font-size:.84rem;
-      font-weight:800;
-      color:var(--coral);
-      background:rgba(255,112,67,.12);
-      padding:8px 10px;
-      border-radius:999px;
-    }
-
-    .plant-zone{
-      position:relative;
-      display:grid;
-      place-items:end center;
-      min-height:260px;
-      padding:10px 10px 0;
-    }
-
-    .bar-wrap{
-      position:relative;
-      width:120px;
-      height:250px;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-    }
-
-    .bar-track{
-      position:absolute;
-      inset:0 auto 0 auto;
-      width:78px;
-      border-radius:20px 20px 10px 10px;
-      background:linear-gradient(180deg,#fff,#eef8f6);
-      border:2px solid rgba(0,150,136,.10);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);
-    }
-
-    .bar-fill{
-      position:absolute;
-      left:50%;
-      bottom:0;
-      transform:translateX(-50%);
-      width:78px;
-      height:var(--bar-h);
-      border-radius:18px 18px 10px 10px;
-      background:linear-gradient(180deg,var(--coral),#ff8a65);
-      box-shadow:0 14px 30px rgba(255,112,67,.18);
-      transition:height .18s ease;
-    }
-
-    .bar-scale{
-      position:absolute;
-      right:-56px;
-      top:0; bottom:0;
-      width:46px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      pointer-events:none;
-      font-size:.82rem;
-      color:var(--muted);
-      font-weight:700;
-    }
-
-    .plant-base{
-      position:absolute;
-      bottom:0;
-      width:190px;
-      height:42px;
-      border-radius:18px;
-      background:linear-gradient(180deg,#d7ccc8,#bcaaa4);
-      box-shadow:0 12px 24px rgba(38,50,56,.12);
-    }
-
-    .plant{
-      position:absolute;
-      bottom:34px;
-      width:116px;
-      height:176px;
-    }
-
-    .stem{
-      position:absolute;
-      left:50%;
-      bottom:0;
-      transform:translateX(-50%);
-      width:10px;
-      height:150px;
-      background:linear-gradient(180deg,#7cb342,#558b2f);
-      border-radius:999px;
-    }
-
-    .leaf{
-      position:absolute;
-      width:54px;
-      height:28px;
-      background:linear-gradient(135deg,#66bb6a,#2e7d32);
-      border-radius:54px 54px 54px 6px;
-      box-shadow:0 8px 20px rgba(46,125,50,.16);
-      transform-origin:left center;
-      transition:transform .18s ease;
-    }
-
-    .leaf.l1{left:16px; bottom:34px; transform:rotate(-30deg)}
-    .leaf.l2{right:16px; bottom:60px; transform:scaleX(-1) rotate(-26deg)}
-    .leaf.l3{left:12px; bottom:92px; transform:rotate(-21deg)}
-    .leaf.l4{right:12px; bottom:118px; transform:scaleX(-1) rotate(-18deg)}
-    .bud{
-      position:absolute;
-      top:2px; left:50%;
-      transform:translateX(-50%);
-      width:34px; height:34px;
-      border-radius:50%;
-      background:radial-gradient(circle at 30% 30%, #ffd180, #ffca28 58%, #f9a825 100%);
-      box-shadow:0 0 0 9px rgba(255,202,40,.16), 0 10px 22px rgba(255,202,40,.18);
-    }
-
-    .stage-controls{
-      display:grid;
-      gap:10px;
-    }
-
-    .control-row{
-      display:grid;
-      grid-template-columns:auto 1fr auto;
-      align-items:center;
-      gap:10px;
-    }
-
-    .step-btn{
-      width:46px;height:46px;
-      border-radius:12px;
-      border:1px solid rgba(38,50,56,.12);
-      background:#fff;
-      color:var(--navy);
-      font-size:1.2rem;
-      font-weight:900;
-      cursor:pointer;
-      transition:transform var(--fast), background var(--fast);
-    }
-    .step-btn:hover,.step-btn:focus-visible{background:var(--mist); transform:translateY(-1px)}
-    .step-btn:focus-visible{outline:3px solid rgba(255,112,67,.18); outline-offset:2px}
-
-    .slider{
-      width:100%;
-      accent-color:var(--coral);
-      cursor:pointer;
-    }
-
-    .control-meta{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      font-size:.93rem;
-      color:var(--muted);
-      font-family:"Century Gothic",system-ui,sans-serif;
-    }
-
-    .control-meta strong{color:var(--navy)}
-
-    .graph-card{
-      background:linear-gradient(180deg,#fff,#fcfffe);
-      border:1px solid rgba(38,50,56,.08);
-      border-radius:16px;
-      padding:14px;
-      min-height:470px;
-      display:grid;
-      grid-template-rows:auto auto 1fr auto;
-      gap:12px;
-    }
-
-    .graph-status{
-      border-radius:14px;
-      padding:11px 12px;
-      background:var(--warn-bg);
-      color:var(--warn);
-      border:1px solid rgba(173,90,0,.12);
-      font-size:.93rem;
-      font-weight:800;
-      transition:background .22s ease, color .22s ease, border-color .22s ease, transform .22s ease;
-    }
-
-    .graph-status.is-correct{
-      background:var(--success-bg);
-      color:var(--success);
-      border-color:rgba(46,125,50,.15);
-      transform:scale(1.01);
-    }
-
-    .equation-strip{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .eq-chip{
-      padding:8px 11px;
-      border-radius:999px;
-      background:rgba(38,50,56,.05);
-      border:1px solid rgba(38,50,56,.10);
-      color:var(--navy);
-      font-weight:800;
-      font-size:.9rem;
-    }
-
-    .eq-chip strong{color:var(--coral)}
-
-    .graph-svg{
-      width:100%;
-      height:auto;
-      display:block;
-      border-radius:14px;
-      background:
-        linear-gradient(180deg, rgba(0,150,136,.04), transparent 28%),
-        #fff;
-    }
-
-    .challenge-row{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:12px;
-      align-items:center;
-    }
-
-    .answer-area{
-      display:grid;
-      gap:10px;
-    }
-
-    .field-row{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:10px;
-    }
-
-    .field{
-      display:grid;
-      gap:6px;
-    }
-
-    .field label{
-      font-size:.9rem;
-      font-weight:800;
-      color:var(--navy);
-    }
-
-    .input,.select,.textarea{
-      width:100%;
-      border:1px solid rgba(38,50,56,.16);
-      background:#fff;
-      border-radius:12px;
-      padding:12px 12px;
-      color:var(--ink);
-      font:600 .98rem/1.3 Montserrat,system-ui,sans-serif;
-      transition:border-color var(--fast), box-shadow var(--fast);
-    }
-
-    .input:focus,.select:focus,.textarea:focus{
-      outline:none;
-      border-color:rgba(255,112,67,.65);
-      box-shadow:0 0 0 4px rgba(255,112,67,.12);
-    }
-
-    .debate-panel{
-      margin-top:18px;
-      display:grid;
-      gap:12px;
-    }
-
-    .discussion-box{
-      border:1px solid rgba(38,50,56,.10);
-      border-radius:16px;
-      padding:14px;
-      background:#fff;
-    }
-
-    .discussion-box h4{
-      margin:0 0 8px;
-      color:var(--navy);
-      font-size:1rem;
-    }
-
-    .discussion-box p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.5;
-      font-size:.98rem;
-    }
-
-    .textarea{
-      resize:vertical;
-      min-height:110px;
-      line-height:1.45;
-      font-weight:600;
-    }
-
-    .memory-list{
-      display:grid;
-      gap:10px;
-      margin-top:14px;
-    }
-
-    .mission-btn{
-      appearance:none;
-      width:100%;
-      text-align:left;
-      border:1px solid rgba(38,50,56,.10);
-      background:#fff;
-      border-radius:14px;
-      padding:14px;
-      cursor:pointer;
-      transition:transform var(--fast), border-color var(--fast), background var(--fast);
-    }
-
-    .mission-btn:hover,.mission-btn:focus-visible{
-      transform:translateY(-1px);
-      border-color:rgba(255,112,67,.35);
-      background:#fffefd;
-    }
-
-    .mission-btn:focus-visible{outline:3px solid rgba(255,112,67,.14); outline-offset:2px}
-    .mission-btn.is-done{
-      border-color:rgba(46,125,50,.24);
-      background:linear-gradient(180deg,#fff,var(--success-bg));
-    }
-
-    .mission-btn .top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:6px;
-    }
-
-    .mission-btn .title{
-      font-size:.98rem;
-      font-weight:800;
-      color:var(--navy);
-    }
-
-    .mission-btn .meta{
-      font-size:.84rem;
-      font-weight:800;
-      color:var(--coral);
-      background:rgba(255,112,67,.10);
-      padding:6px 8px;
-      border-radius:999px;
-      white-space:nowrap;
-    }
-
-    .mission-btn .desc{
-      font-size:.94rem;
-      line-height:1.45;
-      color:var(--muted);
-      font-family:"Century Gothic",system-ui,sans-serif;
-    }
-
-    .support-card{
-      margin-top:16px;
-      padding:14px;
-      border-radius:16px;
-      background:linear-gradient(180deg,rgba(0,150,136,.08),rgba(0,150,136,.04));
-      border:1px solid rgba(0,150,136,.14);
-    }
-
-    .support-card h4{
-      margin:0 0 8px;
-      color:var(--navy);
-      font-size:1rem;
-    }
-
-    .support-card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.5;
-      font-size:.96rem;
-    }
-
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:22px;
-      transform:translateX(-50%) translateY(120px);
-      background:var(--navy);
-      color:#fff;
-      border-radius:999px;
-      padding:14px 18px;
-      font-weight:800;
-      z-index:1100;
-      box-shadow:var(--shadow);
-      transition:transform .26s cubic-bezier(.2,.8,.2,1);
-      max-width:min(90vw,700px);
-      text-align:center;
-    }
-
-    .toast.is-show{transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--success)}
-    .toast.error{background:var(--coral)}
-
-    @media (max-width:1040px){
-      .hero,.main-grid,.model-grid{grid-template-columns:1fr}
-      .field-row{grid-template-columns:1fr}
-      .topbar{height:auto; padding:10px 0}
-      .status-strip{justify-content:flex-start}
-    }
-
-    @media (max-width:640px){
-      .app-shell{padding:0 12px 22px}
-      .topbar-inner{padding:0 12px}
-      .hero-card,.panel{padding:16px}
-      .stage,.graph-card{min-height:auto}
-      .brand-copy p{display:none}
-      .control-row{grid-template-columns:44px 1fr 44px}
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HELIX-PREDICT · Graphs &amp; Relationships</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════ */
+:root {
+  --navy:    #263238;
+  --navy-lt: #37474F;
+  --teal:    #009688;
+  --teal-dk: #00796B;
+  --coral:   #FF7043;
+  --coral-dk:#E64A19;
+  --paper:   #FAFAF8;
+  --sand:    #EFEFEB;
+  --white:   #FFFFFF;
+  --gray-lt: #F5F5F3;
+  --gray:    #9E9E9E;
+  --gray-dk: #616161;
+  --success: #43A047;
+  --text:    #263238;
+  --text2:   #546E7A;
+  --border:  #DDE2E6;
+  --font:    'Montserrat', system-ui, sans-serif;
+  --hud:     60px;
+  --r:       12px;
+  --r-sm:    8px;
+  --fast:    .16s;
+  --med:     .28s;
+  --shadow:  0 2px 14px rgba(0,0,0,.07);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.13);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  font-family: var(--font);
+  background: var(--paper);
+  background-image: radial-gradient(var(--border) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  color: var(--text);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════
+   BOOT SCREEN
+═══════════════════════════════════════════════════ */
+#boot {
+  position: fixed; inset: 0; z-index: 5000;
+  background: var(--navy);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--white);
+  transition: opacity .45s ease;
+}
+.boot-logo {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 800; color: var(--teal);
+  letter-spacing: -.02em; margin-bottom: .4rem;
+}
+.boot-sub {
+  font-size: .95rem; color: var(--gray);
+  font-weight: 500; letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: 3rem;
+}
+.mode-row {
+  display: flex; gap: 1.5rem;
+  flex-wrap: wrap; justify-content: center;
+}
+.mode-card {
+  background: rgba(255,255,255,.055);
+  border: 2px solid rgba(255,255,255,.1);
+  border-radius: var(--r);
+  padding: 2rem 2.25rem; width: 256px;
+  text-align: center; cursor: pointer;
+  transition: background var(--med), border-color var(--med), transform var(--med), box-shadow var(--med);
+  outline: none;
+}
+.mode-card:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; }
+.mode-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: .6rem; }
+.mode-card p  { font-size: .86rem; color: var(--gray); line-height: 1.55; }
+
+.mode-card.solo:hover,
+.mode-card.solo:focus-visible {
+  background: var(--teal); border-color: var(--teal);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px rgba(0,150,136,.38);
+}
+.mode-card.coop { border-color: rgba(255,112,67,.4); }
+.mode-card.coop h3 { color: var(--coral); }
+.mode-card.coop:hover,
+.mode-card.coop:focus-visible {
+  background: var(--coral); border-color: var(--coral);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px rgba(255,112,67,.38);
+}
+.mode-card.coop:hover h3,
+.mode-card.coop:focus-visible h3 { color: var(--white); }
+
+/* ═══════════════════════════════════════════════════
+   CO-OP GATE MODAL
+═══════════════════════════════════════════════════ */
+#coop-modal {
+  position: fixed; inset: 0; z-index: 6000;
+  background: rgba(38,50,56,.85);
+  display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(5px);
+}
+.modal-box {
+  background: var(--white); border-radius: var(--r);
+  padding: 2.5rem; max-width: 420px; width: calc(100% - 2rem);
+  box-shadow: var(--shadow-lg); text-align: center;
+  animation: popIn .25s cubic-bezier(.22,1,.36,1);
+}
+@keyframes popIn {
+  from { transform: scale(.94); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.modal-box h2 { color: var(--coral); margin-bottom: .65rem; font-size: 1.3rem; }
+.modal-box p  {
+  color: var(--text2); margin-bottom: 2rem;
+  font-size: .97rem; line-height: 1.55;
+}
+.modal-actions { display: flex; gap: .85rem; justify-content: center; }
+
+/* ═══════════════════════════════════════════════════
+   HUD
+═══════════════════════════════════════════════════ */
+#hud {
+  position: fixed; top: 0; left: 0; width: 100%;
+  height: var(--hud); z-index: 1000;
+  background: var(--navy); color: var(--white);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,.2);
+}
+.hud-left {
+  display: flex; align-items: center; gap: .55rem;
+}
+.hud-left svg { opacity: .6; flex-shrink: 0; }
+#hud-protocol { font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.55); }
+.hud-right { display: flex; align-items: center; gap: 1.5rem; }
+.hud-stat { display: flex; flex-direction: column; align-items: center; }
+.hud-lbl  {
+  font-size: .62rem; text-transform: uppercase;
+  letter-spacing: .09em; color: rgba(255,255,255,.42);
+  line-height: 1;
+}
+.hud-val  { font-size: 1.05rem; font-weight: 700; line-height: 1.25; }
+.hud-val.phase  { color: var(--teal); }
+.hud-val.streak { color: #FFB74D; }
+.hud-sep  { width: 1px; height: 26px; background: rgba(255,255,255,.12); }
+.streak-glow { text-shadow: 0 0 12px rgba(255,183,77,.7); }
+
+/* ═══════════════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════════════ */
+#app {
+  margin-top: calc(var(--hud) + 2.25rem);
+  padding: 0 1.25rem 3.5rem;
+  flex: 1;
+  display: flex; justify-content: center; align-items: flex-start;
+}
+
+/* ═══════════════════════════════════════════════════
+   PHASE CARDS
+═══════════════════════════════════════════════════ */
+.phase {
+  background: var(--white);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  width: 100%; max-width: 1060px;
+  padding: 2.75rem 3rem;
+  display: none;
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .36s ease, transform .36s ease;
+}
+.phase.active { display: block; opacity: 1; transform: translateY(0); }
+
+.phase-eyebrow {
+  font-size: .68rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: .45rem;
+}
+.phase-title {
+  font-size: 1.85rem; font-weight: 800;
+  color: var(--navy); letter-spacing: -.02em;
+  margin-bottom: .55rem; line-height: 1.12;
+}
+.phase-desc {
+  font-size: .96rem; color: var(--text2);
+  line-height: 1.62; max-width: 66ch;
+  margin-bottom: 2rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center;
+  justify-content: center; gap: 7px;
+  padding: 12px 24px; border-radius: var(--r-sm); border: none;
+  font-family: var(--font); font-size: .93rem; font-weight: 700;
+  cursor: pointer;
+  transition: background var(--fast), transform var(--fast),
+              box-shadow var(--fast), opacity var(--fast), border-color var(--fast);
+}
+.btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.btn:hover:not(:disabled)  { transform: translateY(-2px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: .42; cursor: not-allowed; transform: none !important; }
+
+.btn-teal {
+  background: var(--teal); color: var(--white);
+}
+.btn-teal:hover:not(:disabled) {
+  background: var(--teal-dk);
+  box-shadow: 0 4px 18px rgba(0,150,136,.3);
+}
+.btn-coral {
+  background: var(--coral); color: var(--white);
+}
+.btn-coral:hover:not(:disabled) {
+  background: var(--coral-dk);
+  box-shadow: 0 4px 18px rgba(255,112,67,.3);
+}
+.btn-ghost {
+  background: transparent;
+  border: 2px solid var(--border);
+  color: var(--text2);
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--teal); color: var(--teal);
+}
+
+/* ═══════════════════════════════════════════════════
+   PHASE 1 — VOCABULARY MATCH
+═══════════════════════════════════════════════════ */
+.term-bank {
+  display: flex; flex-wrap: wrap; gap: .85rem;
+  background: var(--gray-lt); border-radius: var(--r);
+  padding: 1.25rem; margin-bottom: 1.75rem;
+  justify-content: center;
+}
+.term-btn {
+  background: var(--white);
+  border: 2px solid var(--border);
+  color: var(--text2);
+  padding: 9px 22px; border-radius: 30px;
+  font-family: var(--font); font-size: .94rem; font-weight: 700;
+  cursor: pointer;
+  transition: background var(--fast), color var(--fast),
+              border-color var(--fast), transform var(--fast);
+}
+.term-btn:hover { border-color: var(--teal); color: var(--teal); }
+.term-btn.active {
+  background: var(--coral); border-color: var(--coral);
+  color: var(--white); transform: scale(1.04);
+}
+.term-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; }
+
+.def-list { display: flex; flex-direction: column; gap: .7rem; }
+.def-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center; gap: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--paper);
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  transition: border-color var(--fast);
+}
+.def-row:hover { border-color: rgba(0,150,136,.25); }
+.def-text {
+  font-size: .97rem; line-height: 1.62; color: var(--text);
+}
+.def-slot {
+  width: 210px; min-height: 44px;
+  border: 2px dashed var(--gray);
+  border-radius: 6px; background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .9rem; color: var(--gray);
+  cursor: pointer; text-align: center; padding: .4rem .7rem;
+  transition: border-color var(--fast), background var(--fast), color var(--fast);
+}
+.def-slot:hover { border-color: var(--teal); background: rgba(0,150,136,.05); }
+.def-slot.filled {
+  border: 2px solid var(--teal);
+  background: rgba(0,150,136,.07);
+  color: var(--navy);
+}
+.def-slot:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+
+/* ═══════════════════════════════════════════════════
+   PHASE 2 — GRAPH IT
+═══════════════════════════════════════════════════ */
+.p2-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr);
+  gap: 2rem;
+}
+.data-panel {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.data-card {
+  background: var(--gray-lt);
+  border-radius: var(--r); padding: 1.4rem;
+}
+.data-card h3 {
+  font-size: .92rem; font-weight: 700;
+  color: var(--navy); margin-bottom: .95rem;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.data-tbl { width: 100%; border-collapse: collapse; }
+.data-tbl th {
+  background: var(--navy); color: var(--white);
+  padding: 10px 14px; text-align: center;
+  font-size: .82rem; font-weight: 700; letter-spacing: .04em;
+}
+.data-tbl th:first-child { border-radius: var(--r-sm) 0 0 0; }
+.data-tbl th:last-child  { border-radius: 0 var(--r-sm) 0 0; }
+.data-tbl td {
+  border: 1px solid var(--border);
+  padding: 10px 14px; text-align: center;
+  font-weight: 700; font-size: .97rem;
+}
+.data-tbl tbody tr:hover td { background: rgba(0,150,136,.05); }
+.graph-hint {
+  background: rgba(0,150,136,.07);
+  border-left: 4px solid var(--teal);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  padding: .9rem 1rem;
+  font-size: .86rem; color: var(--text2); line-height: 1.55;
+}
+.graph-hint strong { color: var(--navy); }
+.plot-count {
+  font-size: .82rem; font-weight: 700;
+  color: var(--text2); text-align: center;
+  padding: .5rem;
+}
+.plot-count span { color: var(--teal); font-size: 1.05rem; }
+
+.svg-wrap {
+  background: var(--white);
+  border: 2px solid var(--sand);
+  border-radius: var(--r); overflow: hidden;
+}
+.svg-wrap svg { display: block; width: 100%; height: auto; cursor: crosshair; }
+.coord-bar {
+  background: var(--navy); color: var(--white);
+  font-size: .78rem; font-weight: 700;
+  padding: 6px 14px; text-align: center;
+  border-radius: 0 0 calc(var(--r) - 2px) calc(var(--r) - 2px);
+  min-height: 30px; display: flex;
+  align-items: center; justify-content: center;
+  color: rgba(255,255,255,.55);
+  transition: color .12s;
+}
+.coord-bar.active { color: var(--teal); }
+
+/* SVG element classes */
+.gl   { stroke: var(--sand); stroke-width: 1; }
+.gl-m { stroke: rgba(0,150,136,.15); stroke-width: 1; } /* major grid */
+.ax   { stroke: var(--navy); stroke-width: 2; }
+.ax-t { font-family: var(--font); font-size: 12px; font-weight: 700; fill: var(--navy); }
+.gl-l { font-family: var(--font); font-size: 10px; fill: var(--gray); }
+.pt-c { fill: var(--coral); stroke: var(--white); stroke-width: 2.5; cursor: pointer; }
+.pt-l { font-family: var(--font); font-size: 10px; font-weight: 700; fill: var(--navy); pointer-events: none; }
+.gh-c { fill: rgba(255,112,67,.4); pointer-events: none; }
+.gh-b { fill: var(--white); stroke: var(--border); stroke-width: 1; pointer-events: none; }
+.gh-t { font-family: var(--font); font-size: 11px; font-weight: 700; fill: var(--navy); pointer-events: none; text-anchor: middle; }
+
+/* ═══════════════════════════════════════════════════
+   PHASE 3 — SOLVE & DISCUSS
+═══════════════════════════════════════════════════ */
+.p3-grid {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1.1fr);
+  gap: 1.75rem; margin-bottom: 1.75rem;
+}
+
+/* Scenario card */
+.scenario-card {
+  background: var(--navy); color: var(--white);
+  border-radius: var(--r); padding: 1.75rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.sc-eyebrow {
+  font-size: .66rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--teal);
+}
+.sc-rate-line {
+  font-size: 1.7rem; font-weight: 800;
+  line-height: 1.15; color: var(--white);
+}
+.sc-rate-line em { color: var(--teal); font-style: normal; }
+.sc-tasks {
+  display: flex; flex-direction: column; gap: .65rem;
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: 1rem;
+}
+.sc-task {
+  display: flex; gap: .65rem; align-items: flex-start;
+  font-size: .9rem; line-height: 1.45; color: rgba(255,255,255,.7);
+}
+.sc-task-n {
+  background: rgba(255,255,255,.1);
+  border-radius: 50%; width: 22px; height: 22px;
+  display: grid; place-items: center;
+  font-size: .72rem; font-weight: 800; flex-shrink: 0;
+  color: var(--teal);
+}
+.sc-task strong { color: var(--white); }
+
+/* Answer card */
+.answer-card {
+  background: var(--paper);
+  border: 2px solid var(--border); border-radius: var(--r);
+  padding: 1.5rem;
+}
+.answer-card-head {
+  font-size: .66rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gray-dk); margin-bottom: 1.1rem;
+}
+.answer-row {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 1rem;
+  padding: .95rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.answer-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+.answer-row:first-of-type { padding-top: 0; }
+.ans-lbl {
+  font-size: .93rem; font-weight: 600;
+  color: var(--text); flex: 1; line-height: 1.35;
+}
+.ans-lbl .hint {
+  display: block; font-size: .78rem; font-weight: 500;
+  color: var(--text2); margin-top: .18rem;
+}
+.ans-inp-group { display: flex; align-items: center; gap: .32rem; flex-shrink: 0; }
+.ans-pre  { font-size: .9rem; font-weight: 700; color: var(--text2); }
+.ans-suf  { font-size: .82rem; font-weight: 600; color: var(--text2); }
+.ans-input {
+  width: 88px; text-align: center;
+  border: 2px solid var(--border); border-radius: 6px;
+  background: var(--white);
+  padding: 8px 10px;
+  font-family: var(--font); font-size: 1rem; font-weight: 800;
+  color: var(--coral);
+  transition: border-color var(--fast), box-shadow var(--fast), color var(--fast);
+}
+.ans-input:focus {
+  outline: none; border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0,150,136,.12);
+}
+.ans-input.correct {
+  border-color: var(--success); color: var(--success); pointer-events: none;
+}
+.ans-select {
+  border: 2px solid var(--border); border-radius: 6px;
+  background: var(--white); padding: 8px 10px;
+  font-family: var(--font); font-size: .88rem; font-weight: 700;
+  color: var(--teal); cursor: pointer; min-width: 180px;
+  transition: border-color var(--fast), box-shadow var(--fast);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E9E9E' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+.ans-select:focus {
+  outline: none; border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0,150,136,.12);
+}
+.ans-select.correct {
+  border-color: var(--success); color: var(--success); pointer-events: none;
+}
+
+.p3-footer {
+  display: flex; justify-content: flex-end;
+  align-items: center; gap: 1rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   DEBRIEF PANEL
+═══════════════════════════════════════════════════ */
+#debrief {
+  display: none; margin-top: 1.75rem;
+  border: 2px solid var(--border); border-radius: var(--r);
+  overflow: hidden;
+  animation: slideIn .38s cubic-bezier(.22,1,.36,1);
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.debrief-header {
+  background: var(--navy); color: var(--white);
+  padding: 1rem 1.5rem;
+  display: flex; align-items: center; gap: .85rem;
+}
+.debrief-header svg { color: var(--teal); flex-shrink: 0; }
+.debrief-header-text { font-size: 1rem; font-weight: 700; }
+.debrief-header-sub  {
+  font-size: .75rem; color: rgba(255,255,255,.45);
+  font-weight: 500; margin-left: auto;
+}
+
+/* Verified answers grid */
+.verified-box {
+  background: rgba(0,150,136,.05);
+  border-bottom: 2px solid rgba(0,150,136,.18);
+  padding: 1.25rem 1.5rem;
+}
+.verified-label {
+  font-size: .66rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: .85rem;
+  display: flex; align-items: center; gap: .45rem;
+}
+.v-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: .65rem;
+}
+.v-item {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: .65rem .85rem;
+}
+.v-lbl {
+  font-size: .68rem; font-weight: 700; color: var(--gray-dk);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.v-val {
+  font-size: 1rem; font-weight: 800; color: var(--navy);
+  margin-top: .18rem;
+}
+
+/* Discussion questions */
+.disc-body { background: var(--white); padding: 1.25rem 1.5rem; }
+.disc-q {
+  display: flex; flex-direction: column; gap: .7rem;
+  padding: 1rem 1.1rem;
+  background: var(--paper);
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  margin-bottom: .85rem;
+}
+.disc-q:last-of-type { margin-bottom: 0; }
+.disc-q-tag {
+  font-size: .66rem; font-weight: 800;
+  letter-spacing: .09em; text-transform: uppercase;
+  color: var(--coral);
+}
+.disc-q-txt {
+  font-size: .97rem; font-weight: 500;
+  color: var(--text); line-height: 1.6;
+}
+.disc-check {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .75rem 1rem; border-radius: 6px;
+  border: 1.5px solid var(--border); background: var(--white);
+  cursor: pointer;
+  transition: border-color var(--fast), background var(--fast);
+  margin-top: .2rem;
+}
+.disc-check:hover { border-color: var(--teal); background: rgba(0,150,136,.03); }
+.disc-check input[type="checkbox"] {
+  width: 19px; height: 19px;
+  accent-color: var(--teal); cursor: pointer; flex-shrink: 0;
+}
+.disc-check label {
+  cursor: pointer; font-size: .9rem;
+  font-weight: 600; color: var(--text2); flex: 1; line-height: 1.4;
+}
+
+.debrief-footer {
+  padding: 1.1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--gray-lt);
+  display: flex; justify-content: flex-end;
+}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+#toast {
+  position: fixed; bottom: 26px; left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  padding: 13px 28px; border-radius: 30px;
+  color: var(--white); font-weight: 700; font-size: .93rem;
+  box-shadow: 0 4px 22px rgba(0,0,0,.18);
+  transition: transform .3s cubic-bezier(.175,.885,.32,1.275);
+  z-index: 2000; pointer-events: none;
+  max-width: 82vw; text-align: center;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+.t-ok  { background: var(--success); }
+.t-err { background: var(--coral); }
+
+/* ═══════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════ */
+.footer {
+  text-align: center; color: var(--gray);
+  font-size: .8rem; padding: .75rem 0 1.75rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  #hud { padding: 0 1.1rem; }
+  .phase { padding: 1.6rem 1.4rem; }
+  .p2-grid, .p3-grid { grid-template-columns: 1fr; }
+  .def-row { grid-template-columns: 1fr; gap: .55rem; }
+  .def-slot { width: 100%; }
+  .v-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .hud-lbl { display: none; }
+  .hud-right { gap: .95rem; }
+  .mode-row { flex-direction: column; align-items: center; }
+  .mode-card { width: 100%; max-width: 300px; }
+  .v-grid { grid-template-columns: 1fr; }
+  .debrief-header-sub { display: none; }
+}
+</style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">VC</div>
-        <div class="brand-copy">
-          <h1>Variable City</h1>
-          <p>Advanced relationships, graphing, and reasoning</p>
-        </div>
-      </div>
 
-      <div class="status-strip" aria-label="Session progress">
-        <div class="pill">Mode: <strong>Advanced</strong></div>
-        <div class="pill" id="xp-pill">XP: <strong>0</strong></div>
-        <div class="pill" id="streak-pill">Streak: <strong>0</strong></div>
-        <div class="pill" id="mastery-pill">Mission: <strong>Explore</strong></div>
-      </div>
+<!-- ══ BOOT ══════════════════════════════════════ -->
+<section id="boot" role="dialog" aria-modal="true" aria-labelledby="boot-logo">
+  <h1 class="boot-logo" id="boot-logo">HELIX-PREDICT</h1>
+  <p class="boot-sub">Graphs &amp; Relationships · Grade 6 Advanced</p>
+  <div class="mode-row">
+    <div class="mode-card solo" role="button" tabindex="0" data-mode="solo"
+         aria-label="Individual mode — work independently">
+      <h3>Individual</h3>
+      <p>Complete all three activities on your own.</p>
+    </div>
+    <div class="mode-card coop" role="button" tabindex="0" data-mode="coop"
+         aria-label="Partner mode — includes discussion prompts">
+      <h3>Partner Mode</h3>
+      <p>Work with a partner. Includes a confirmation step and discussion questions.</p>
     </div>
   </div>
+</section>
 
-  <div class="app-shell">
-    <section class="hero" id="top">
-      <div class="card hero-card">
-        <div class="eyebrow">6th Grade GT · Relationship Lab</div>
-        <h2>Build the relationship, read the graph, <span class="accent">defend the rule</span>.</h2>
-        <p>
-          Move the light input, watch the plant height update, and track the matching point on the graph.
-          Then solve a stronger reasoning challenge with a total, a limit, and variable analysis.
-        </p>
-        <div class="hero-actions">
-          <button class="btn btn--primary" id="jump-model">Start Model</button>
-          <button class="btn btn--secondary" id="jump-challenge">Jump to Challenge</button>
-          <button class="btn btn--ghost" id="reset-btn">Reset Session</button>
-        </div>
-      </div>
-
-      <div class="card workflow-card">
-        <h3 class="workflow-title">Linear Workflow</h3>
-        <div class="crumbs" aria-label="Activity workflow">
-          <div class="crumb is-active" id="crumb-explore">1. Explore</div>
-          <div class="crumb" id="crumb-quiz">2. Verify</div>
-          <div class="crumb" id="crumb-debrief">3. Debrief</div>
-        </div>
-        <p style="margin:0;color:var(--muted);line-height:1.5;font-size:.97rem">
-          Advanced students are expected to connect three representations: the input control, the visual model,
-          and the coordinate point. Strong answers explain <strong>why</strong> the data point belongs on the graph.
-        </p>
-      </div>
-    </section>
-
-    <section class="main-grid">
-      <div class="card panel" id="model-section">
-        <div class="panel-head">
-          <div>
-            <h3>Live Relationship Model</h3>
-            <p>Use the slider or the plus/minus controls. The bar, graph point, coordinate label, and rule all update together.</p>
-          </div>
-        </div>
-
-        <div class="tag-row">
-          <div class="tag tag--ind">Independent Variable = Light Units (x)</div>
-          <div class="tag tag--dep">Dependent Variable = Plant Height in cm (y)</div>
-        </div>
-
-        <div class="model-grid">
-          <div class="stage">
-            <div class="stage-title">
-              <h4>Bar Stage</h4>
-              <div class="light-badge" id="light-badge">x = 1 unit</div>
-            </div>
-
-            <div class="plant-zone">
-              <div class="plant-base" aria-hidden="true"></div>
-
-              <div class="bar-wrap" aria-hidden="true">
-                <div class="bar-track"></div>
-                <div class="bar-fill" id="bar-fill"></div>
-                <div class="bar-scale">
-                  <span>25 cm</span>
-                  <span>20 cm</span>
-                  <span>15 cm</span>
-                  <span>10 cm</span>
-                  <span>5 cm</span>
-                  <span>0 cm</span>
-                </div>
-              </div>
-
-              <div class="plant" id="plant-visual" aria-hidden="true">
-                <div class="bud"></div>
-                <div class="stem"></div>
-                <div class="leaf l1"></div>
-                <div class="leaf l2"></div>
-                <div class="leaf l3"></div>
-                <div class="leaf l4"></div>
-              </div>
-            </div>
-
-            <div class="stage-controls">
-              <div class="control-row">
-                <button class="step-btn" id="minus-btn" aria-label="Decrease light units by 1">−</button>
-                <input
-                  class="slider"
-                  id="light-slider"
-                  type="range"
-                  min="1"
-                  max="5"
-                  step="1"
-                  value="1"
-                  aria-label="Light units"
-                  aria-describedby="live-graph-announcer"
-                />
-                <button class="step-btn" id="plus-btn" aria-label="Increase light units by 1">+</button>
-              </div>
-
-              <div class="control-meta">
-                <div><strong>Rule:</strong> Height = 5 × Light Units</div>
-                <div><strong>Current point:</strong> <span id="current-point-text">(1, 5)</span></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="graph-card">
-            <div class="graph-status" id="graph-status">
-              System Status: Explore the relationship. Then predict, verify, and explain the pattern.
-            </div>
-
-            <div class="equation-strip">
-              <div class="eq-chip">Rule: <strong>y = 5x</strong></div>
-              <div class="eq-chip">Unit rate: <strong>5 cm per light unit</strong></div>
-              <div class="eq-chip">Inverse check: <strong>x = y ÷ 5</strong></div>
-            </div>
-
-            <svg
-              id="graph-svg"
-              class="graph-svg"
-              viewBox="0 0 560 340"
-              role="img"
-              aria-labelledby="graph-title graph-desc"
-            >
-              <title id="graph-title">Coordinate graph of light units and plant height</title>
-              <desc id="graph-desc">A coordinate graph showing the relationship y equals 5 times x. A ghost guide connects the bar height to the plotted point.</desc>
-
-              <defs>
-                <marker id="arrow-head" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                  <polygon points="0 0, 8 4, 0 8" fill="#263238"></polygon>
-                </marker>
-              </defs>
-
-              <rect x="0" y="0" width="560" height="340" fill="#ffffff" rx="16"></rect>
-
-              <g id="grid-layer"></g>
-
-              <line x1="70" y1="30" x2="70" y2="275" stroke="#263238" stroke-width="2"></line>
-              <line x1="70" y1="275" x2="520" y2="275" stroke="#263238" stroke-width="2" marker-end="url(#arrow-head)"></line>
-              <line x1="70" y1="275" x2="70" y2="25" stroke="#263238" stroke-width="2" marker-end="url(#arrow-head)"></line>
-
-              <text x="295" y="318" text-anchor="middle" font-size="14" font-weight="800" fill="#263238">Light Units (x)</text>
-              <text x="24" y="160" text-anchor="middle" font-size="14" font-weight="800" fill="#263238" transform="rotate(-90 24 160)">Plant Height (y)</text>
-
-              <polyline
-                id="relation-line"
-                fill="none"
-                stroke="#009688"
-                stroke-width="4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                points=""
-              ></polyline>
-
-              <line
-                id="ghost-guide"
-                x1="0" y1="0" x2="0" y2="0"
-                stroke="#FF7043"
-                stroke-width="3"
-                stroke-dasharray="8 7"
-                opacity=".95"
-              ></line>
-
-              <circle id="active-point" cx="0" cy="0" r="9" fill="#FF7043" stroke="#fff" stroke-width="4"></circle>
-              <rect id="point-label-bg" x="0" y="0" width="78" height="28" rx="10" fill="rgba(255,255,255,.96)" stroke="rgba(38,50,56,.10)"></rect>
-              <text id="point-label" x="0" y="0" text-anchor="middle" font-size="13" font-weight="800" fill="#263238">(1, 5)</text>
-            </svg>
-
-            <div class="challenge-row">
-              <div style="color:var(--muted);font-size:.95rem;line-height:1.5">
-                Advanced lens: explain how the bar height, the equation, and the graph all represent the same ordered pair.
-              </div>
-              <button class="btn btn--ghost" id="check-model-btn">Verify Model</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="support-card">
-          <h4>Talk Move</h4>
-          <p>
-            “Because the input is <strong id="talk-x">1</strong> and the rule is <strong>y = 5x</strong>,
-            the output must be <strong id="talk-y">5</strong>, so the correct point is <strong id="talk-point">(1, 5)</strong>.”
-          </p>
-        </div>
-      </div>
-
-      <aside>
-        <div class="card panel">
-          <div class="panel-head">
-            <div>
-              <h3>Mission Queue</h3>
-              <p>Use the buttons or keyboard. Each mission is fully focusable and updates the workflow state.</p>
-            </div>
-          </div>
-
-          <div class="memory-list">
-            <button class="mission-btn" id="mission-explore" data-target="model-section">
-              <div class="top">
-                <div class="title">Mission 1 · Explore</div>
-                <div class="meta">Input → Output</div>
-              </div>
-              <div class="desc">Adjust the light units and watch the plant height and graph point update together.</div>
-            </button>
-
-            <button class="mission-btn" id="mission-verify" data-target="challenge-section">
-              <div class="top">
-                <div class="title">Mission 2 · Verify</div>
-                <div class="meta">Rule Check</div>
-              </div>
-              <div class="desc">Solve a stronger reasoning challenge with a total, a limit, and variable identification.</div>
-            </button>
-
-            <button class="mission-btn" id="mission-debrief" data-target="challenge-section">
-              <div class="top">
-                <div class="title">Mission 3 · Debrief</div>
-                <div class="meta">Sentence Kernel</div>
-              </div>
-              <div class="desc">Write a complete explanation using evidence from your exact values and the rule.</div>
-            </button>
-          </div>
-        </div>
-
-        <div class="card panel">
-          <div class="panel-head">
-            <div>
-              <h3>Live Audio Summary</h3>
-              <p>Designed for stronger screen reader continuity.</p>
-            </div>
-          </div>
-          <div style="color:var(--muted);line-height:1.55;font-size:.97rem">
-            Current relationship:
-            <strong id="sidebar-summary" style="color:var(--navy)">1 light unit gives a height of 5 centimeters.</strong>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="card panel" id="challenge-section" style="margin-top:18px">
-      <div class="panel-head">
-        <div>
-          <h3>Advanced Verification Challenge</h3>
-          <p>
-            Solve the rule-based scenario, then complete the sentence kernel.
-            Progress only unlocks after written reasoning is submitted.
-          </p>
-        </div>
-      </div>
-
-      <div class="tag-row">
-        <div class="tag">Challenge Type: Constant Rate</div>
-        <div class="tag">Focus: Total + Limit + Variable Logic</div>
-        <div class="tag">Expectation: Precise explanation</div>
-      </div>
-
-      <div class="discussion-box" id="scenario-box">
-        <h4 id="scenario-title">Scenario</h4>
-        <p id="scenario-text"></p>
-      </div>
-
-      <div class="answer-area" style="margin-top:14px">
-        <div class="field-row">
-          <div class="field">
-            <label for="ans-rate">Rate per unit</label>
-            <input id="ans-rate" class="input" type="number" inputmode="numeric" placeholder="Enter rate">
-          </div>
-          <div class="field">
-            <label for="ans-total">Total for the given amount</label>
-            <input id="ans-total" class="input" type="number" inputmode="numeric" placeholder="Enter total">
-          </div>
-          <div class="field">
-            <label for="ans-limit">Greatest amount under the limit</label>
-            <input id="ans-limit" class="input" type="number" inputmode="numeric" placeholder="Enter max amount">
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="ans-variable">Dependent variable</label>
-          <select id="ans-variable" class="select">
-            <option value="">Select one</option>
-            <option value="ind">Number of items or time units</option>
-            <option value="dep">Total output</option>
-          </select>
-        </div>
-
-        <div style="display:flex; gap:12px; flex-wrap:wrap">
-          <button class="btn btn--secondary" id="check-challenge-btn">Verify Challenge</button>
-          <button class="btn btn--ghost" id="new-scenario-btn">New Scenario</button>
-        </div>
-      </div>
-
-      <div class="debate-panel" id="debrief-panel" hidden>
-        <div class="discussion-box">
-          <h4>Verified Answer Review</h4>
-          <p id="verified-review"></p>
-        </div>
-
-        <div class="discussion-box">
-          <h4>Sentence Kernel</h4>
-          <p style="margin-bottom:10px">
-            Complete this explanation using your exact values:
-            <strong>Because I changed the input to ___, the output became ___, which proves that ___.
-            Also, the dependent variable is ___ because ___.</strong>
-          </p>
-          <label class="sr-only" for="kernel-response">Sentence kernel response</label>
-          <textarea
-            id="kernel-response"
-            class="textarea"
-            placeholder="Write a complete explanation using your exact values and the rule."
-          ></textarea>
-          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px">
-            <button class="btn btn--primary" id="submit-kernel-btn">Submit Explanation</button>
-            <button class="btn btn--ghost" id="clear-kernel-btn">Clear</button>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- ══ CO-OP MODAL ════════════════════════════════ -->
+<div id="coop-modal" role="dialog" aria-modal="true"
+     aria-labelledby="cm-title" aria-describedby="cm-desc">
+  <div class="modal-box">
+    <h2 id="cm-title">Before you check…</h2>
+    <p id="cm-desc">Did both partners explain their reasoning — not just share an answer?</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" data-coop="back">Go back first</button>
+      <button type="button" class="btn btn-coral"  data-coop="go">Yes, check it</button>
+    </div>
   </div>
+</div>
 
-  <div id="live-graph-announcer" class="sr-only" aria-live="polite"></div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<!-- ══ HUD ═══════════════════════════════════════ -->
+<header id="hud" aria-label="Session status">
+  <div class="hud-left">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+         stroke="var(--teal)" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+    </svg>
+    <span id="hud-protocol">Loading…</span>
+  </div>
+  <div class="hud-right">
+    <div class="hud-stat">
+      <span class="hud-lbl">Activity</span>
+      <span class="hud-val phase" id="hud-phase">—</span>
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-stat">
+      <span class="hud-lbl">Streak</span>
+      <span class="hud-val streak" id="hud-streak">0</span>
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-stat">
+      <span class="hud-lbl">XP</span>
+      <span class="hud-val" id="hud-xp">0</span>
+    </div>
+  </div>
+</header>
 
-  <script>
-    const RULE = {
-      slope: 5,
-      maxInput: 5,
-      minInput: 1,
-      output(x) {
-        return x * this.slope;
-      },
-      inverse(y) {
-        return y / this.slope;
-      },
-      orderedPair(x) {
-        return { x, y: this.output(x) };
+<!-- ══ MAIN ═══════════════════════════════════════ -->
+<main id="app">
+
+  <!-- ── PHASE 1: VOCABULARY MATCH ──────────────── -->
+  <section id="phase-1" class="phase" aria-label="Activity 1: Vocabulary Match">
+    <div class="phase-eyebrow">Activity 1 of 3</div>
+    <h2 class="phase-title">Vocabulary Match</h2>
+    <p class="phase-desc">
+      Click a term in the bank to select it, then click the correct definition to place it.
+      Click a filled slot to remove a term and try again.
+    </p>
+    <div class="term-bank" id="term-bank" role="listbox" aria-label="Term bank"></div>
+    <div class="def-list" id="def-list" aria-label="Definitions"></div>
+    <div style="margin-top:2rem;text-align:right;">
+      <button type="button" class="btn btn-teal" id="btn-p1">Check Matches</button>
+    </div>
+  </section>
+
+  <!-- ── PHASE 2: GRAPH IT ──────────────────────── -->
+  <section id="phase-2" class="phase" aria-label="Activity 2: Graph It">
+    <div class="phase-eyebrow">Activity 2 of 3</div>
+    <h2 class="phase-title">Graph It</h2>
+    <p class="phase-desc">
+      Plot all 4 ordered pairs from the table on the coordinate plane.
+      Hover to preview a point — click to plot it. Click any plotted point to remove it.
+    </p>
+    <div class="p2-grid">
+
+      <div class="data-panel">
+        <div class="data-card">
+          <h3>Research Drone: Distance Over Time</h3>
+          <table class="data-tbl" id="p2-table" aria-label="Drone data table">
+            <thead>
+              <tr><th>Time (min)</th><th>Distance (ft)</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="graph-hint">
+          <strong>Check your work:</strong> Are all 4 points plotted from the table?
+          Does the pattern suggest a constant rate?
+          Would the line pass through the origin if extended?
+        </div>
+        <div class="plot-count" id="plot-count">Points plotted: <span id="plot-n">0</span> / 4</div>
+      </div>
+
+      <div>
+        <div class="svg-wrap" id="svg-wrap" aria-label="Interactive coordinate plane"></div>
+        <div class="coord-bar" id="coord-bar">Hover over the graph to preview a point</div>
+      </div>
+
+    </div>
+    <div style="margin-top:2rem;text-align:right;">
+      <button type="button" class="btn btn-teal" id="btn-p2">Check Graph</button>
+    </div>
+  </section>
+
+  <!-- ── PHASE 3: SOLVE & DISCUSS ───────────────── -->
+  <section id="phase-3" class="phase" aria-label="Activity 3: Solve and Discuss">
+    <div class="phase-eyebrow">Activity 3 of 3</div>
+    <h2 class="phase-title">Solve &amp; Discuss</h2>
+    <p class="phase-desc">
+      Read the scenario on the left, then fill in all four answers on the right.
+      After checking, complete the partner discussion to unlock the next problem.
+    </p>
+
+    <div class="p3-grid">
+
+      <!-- Scenario -->
+      <div class="scenario-card" id="p3-scenario">
+        <!-- injected by JS -->
+      </div>
+
+      <!-- Answer inputs -->
+      <div class="answer-card">
+        <div class="answer-card-head">Your Answers</div>
+        <div id="p3-inputs"><!-- injected by JS --></div>
+      </div>
+
+    </div>
+
+    <!-- Check button row -->
+    <div class="p3-footer" id="p3-footer">
+      <button type="button" class="btn btn-coral" id="btn-p3">Check Answers</button>
+    </div>
+
+    <!-- ── DEBRIEF ───────────────────────────────── -->
+    <div id="debrief" aria-label="Partner discussion">
+
+      <div class="debrief-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="debrief-header-text">Partner Discussion</span>
+        <span class="debrief-header-sub">Complete both questions to continue</span>
+      </div>
+
+      <div class="verified-box">
+        <div class="verified-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="var(--teal)" stroke-width="3" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Verified Answers
+        </div>
+        <div class="v-grid" id="v-grid"><!-- injected by JS --></div>
+      </div>
+
+      <div class="disc-body">
+        <div class="disc-q">
+          <div class="disc-q-tag">Discussion Question 1</div>
+          <div class="disc-q-txt" id="dq1"></div>
+          <div class="disc-check">
+            <input type="checkbox" class="d-cb" id="dc1"/>
+            <label for="dc1">We discussed this question together.</label>
+          </div>
+        </div>
+        <div class="disc-q">
+          <div class="disc-q-tag">Discussion Question 2</div>
+          <div class="disc-q-txt" id="dq2"></div>
+          <div class="disc-check">
+            <input type="checkbox" class="d-cb" id="dc2"/>
+            <label for="dc2">We discussed this question together.</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="debrief-footer">
+        <button type="button" class="btn btn-teal" id="btn-next" disabled>
+          Next Problem →
+        </button>
+      </div>
+
+    </div><!-- /debrief -->
+
+  </section>
+
+</main>
+
+<footer class="footer">Neft.Alba · Flagship Grade 6 Math · Advanced Track</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── UTILS ────────────────────────────────────────── */
+const $  = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+function n(v) { return typeof v === 'number' ? v.toLocaleString() : v; }
+function fv(t, v) {
+  return t.unit === '$' ? `$${n(v)}` : `${n(v)} ${t.unit}`;
+}
+
+/* ── STATE ────────────────────────────────────────── */
+const G = {
+  mode: 'solo', xp: 0, streak: 0, phase: 1,
+  pendingCB: null,
+
+  p1: {
+    selected: null,
+    pairs: [
+      { id:'iv', text:'Independent Variable',
+        def: 'The input quantity you choose or control. It does not depend on the other variable.' },
+      { id:'dv', text:'Dependent Variable',
+        def: 'The output quantity whose value is determined by the input.' },
+      { id:'xa', text:'x-axis',
+        def: 'The horizontal number line on the coordinate plane — used for input values.' },
+      { id:'ya', text:'y-axis',
+        def: 'The vertical number line on the coordinate plane — used for output values.' },
+    ]
+  },
+
+  p2: {
+    data: [{x:2,y:2700},{x:4,y:5400},{x:7,y:9450},{x:11,y:14850}],
+    plotted: [],
+    /* yStep:12 means 12 divisions × 1350 each = 16200 — every data point lands on a gridline */
+    cfg: { W:580, H:400, pad:60, xMax:12, yMax:16200, xStep:12, yStep:12, snap:1350 }
+  },
+
+  p3: { cur: {} }
+};
+
+/* ── HUD ──────────────────────────────────────────── */
+function updateHUD() {
+  const labels = { 1:'Vocabulary Match', 2:'Graph It', 3:'Solve & Discuss' };
+  $('#hud-phase').textContent = `${G.phase} · ${labels[G.phase]}`;
+  const el = $('#hud-streak');
+  el.textContent = G.streak + (G.streak >= 3 ? ' 🔥' : '');
+  el.classList.toggle('streak-glow', G.streak >= 3);
+  $('#hud-xp').textContent = G.xp;
+}
+
+/* ── TOAST ────────────────────────────────────────── */
+let _tt;
+function toast(msg, ok) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = (ok ? 't-ok' : 't-err') + ' show';
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+/* ── PHASE SWITCH ─────────────────────────────────── */
+function switchPhase(n) {
+  $$('.phase').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  G.phase = n;
+  const t = $(`#phase-${n}`);
+  if (!t) return;
+  t.style.display = 'block';
+  void t.offsetWidth; // reflow for animation
+  t.classList.add('active');
+  updateHUD();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── AWARD XP ─────────────────────────────────────── */
+function award(xp, ok) {
+  G.xp += xp;
+  G.streak = ok ? G.streak + 1 : 0;
+  updateHUD();
+}
+
+/* ── CO-OP GATE ───────────────────────────────────── */
+function withCheck(cb) {
+  if (G.mode === 'coop') {
+    G.pendingCB = cb;
+    $('#coop-modal').style.display = 'flex';
+  } else {
+    cb();
+  }
+}
+function closeModal(proceed) {
+  $('#coop-modal').style.display = 'none';
+  if (proceed && G.pendingCB) G.pendingCB();
+  G.pendingCB = null;
+}
+
+/* ════════════════════════════════════════════════════
+   PHASE 1 — VOCABULARY MATCH
+════════════════════════════════════════════════════ */
+function initP1() {
+  const bank = $('#term-bank');
+  const list = $('#def-list');
+  bank.innerHTML = list.innerHTML = '';
+  G.p1.selected = null;
+
+  G.p1.pairs.forEach(p => {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'term-btn';
+    btn.textContent = p.text; btn.dataset.id = p.id;
+    btn.addEventListener('click', () => pickTerm(p.id));
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickTerm(p.id); }
+    });
+    bank.appendChild(btn);
+  });
+
+  [...G.p1.pairs].sort(() => Math.random() - .5).forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'def-row';
+    row.innerHTML = `
+      <div class="def-text">${p.def}</div>
+      <div class="def-slot" tabindex="0" role="button" aria-label="Term slot"
+           data-match="${p.id}">Drop term here</div>`;
+    const slot = row.querySelector('.def-slot');
+    slot.addEventListener('click', () => fillSlot(slot));
+    slot.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fillSlot(slot); }
+    });
+    list.appendChild(row);
+  });
+}
+
+function pickTerm(id) {
+  $$('.term-btn').forEach(b => b.classList.remove('active'));
+  const btn = $(`.term-btn[data-id="${id}"]`);
+  if (!btn || btn.hidden) return;
+  btn.classList.add('active');
+  G.p1.selected = { id, text: btn.textContent, el: btn };
+}
+
+function fillSlot(slot) {
+  const sel = G.p1.selected;
+  if (sel && !slot.dataset.filled) {
+    slot.textContent = sel.text;
+    slot.dataset.filled = sel.id;
+    slot.classList.add('filled');
+    sel.el.hidden = true;
+    G.p1.selected = null;
+    $$('.term-btn').forEach(b => b.classList.remove('active'));
+  } else if (slot.dataset.filled) {
+    const oldId = slot.dataset.filled;
+    const origBtn = $(`.term-btn[data-id="${oldId}"]`);
+    if (origBtn) origBtn.hidden = false;
+    slot.textContent = 'Drop term here';
+    slot.dataset.filled = '';
+    slot.classList.remove('filled');
+  }
+}
+
+function checkP1() {
+  withCheck(() => {
+    const slots = $$('.def-slot');
+    const correct = [...slots].filter(s => s.dataset.match === s.dataset.filled).length;
+    if (correct === G.p1.pairs.length) {
+      award(120, true);
+      toast('All terms matched correctly! ✓', true);
+      setTimeout(() => { switchPhase(2); initP2(); }, 1300);
+    } else {
+      award(0, false);
+      toast(`${correct} of ${G.p1.pairs.length} correct — check your answers.`, false);
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════════
+   PHASE 2 — GRAPH IT
+════════════════════════════════════════════════════ */
+function initP2() {
+  const tbody = $('#p2-table tbody');
+  tbody.innerHTML = '';
+  G.p2.plotted = [];
+  G.p2.data.forEach(pt => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${pt.x}</td><td>${n(pt.y)}</td>`;
+    tbody.appendChild(tr);
+  });
+  renderSVG();
+}
+
+/* Map a data value to SVG viewBox pixel */
+function toSx(val, c) {
+  return c.pad + (val / c.xMax) * (c.W - c.pad * 2);
+}
+function toSy(val, c) {
+  return c.H - c.pad - (val / c.yMax) * (c.H - c.pad * 2);
+}
+/* Map a SVG pixel to data value */
+function toDx(px, c) { return (px - c.pad) / (c.W - c.pad * 2) * c.xMax; }
+function toDy(py, c) { return (c.H - c.pad - py) / (c.H - c.pad * 2) * c.yMax; }
+
+function renderSVG() {
+  const c = G.p2.cfg;
+  const gW = c.W - c.pad * 2, gH = c.H - c.pad * 2;
+  const total = G.p2.data.length;
+  let s = `<svg id="svg-el" viewBox="0 0 ${c.W} ${c.H}"
+    role="application" tabindex="0"
+    aria-label="Coordinate plane — plot time vs distance">`;
+
+  /* ── grid lines ── */
+  for (let i = 0; i <= c.yStep; i++) {
+    const y = c.H - c.pad - i * (gH / c.yStep);
+    const val = i * (c.yMax / c.yStep);
+    /* highlight gridlines that match data y-values */
+    const isData = G.p2.data.some(d => d.y === val);
+    s += `<line class="${isData ? 'gl-m' : 'gl'}" x1="${c.pad}" y1="${y}" x2="${c.W - c.pad}" y2="${y}"/>`;
+    /* label every other line to avoid crowding */
+    if (i % 2 === 0 && i > 0) {
+      s += `<text class="gl-l" text-anchor="end" x="${c.pad - 7}" y="${y + 4}">${n(val)}</text>`;
+    }
+  }
+  for (let i = 0; i <= c.xStep; i++) {
+    const x = c.pad + i * (gW / c.xStep);
+    const val = i;
+    s += `<line class="gl" x1="${x}" y1="${c.pad}" x2="${x}" y2="${c.H - c.pad}"/>`;
+    s += `<text class="gl-l" text-anchor="middle" x="${x}" y="${c.H - c.pad + 17}">${val}</text>`;
+  }
+
+  /* ── axes ── */
+  s += `<line class="ax" x1="${c.pad}" y1="${c.pad}" x2="${c.pad}" y2="${c.H - c.pad}"/>`;
+  s += `<line class="ax" x1="${c.pad}" y1="${c.H - c.pad}" x2="${c.W - c.pad}" y2="${c.H - c.pad}"/>`;
+
+  /* ── axis titles ── */
+  s += `<text class="ax-t" text-anchor="middle" x="${c.W / 2}" y="${c.H - 5}">Time (minutes)</text>`;
+  s += `<text class="ax-t" text-anchor="middle" x="16" y="${c.H / 2}"
+    transform="rotate(-90 16 ${c.H / 2})">Distance (ft)</text>`;
+
+  /* ── plotted points ── */
+  G.p2.plotted.forEach((pt, idx) => {
+    const sx = toSx(pt.x, c), sy = toSy(pt.y, c);
+    s += `<circle class="pt-c" cx="${sx}" cy="${sy}" r="7" tabindex="0"
+      data-idx="${idx}" aria-label="Point (${pt.x}, ${n(pt.y)}) — press Delete to remove"/>`;
+    /* label offset: push right if near left edge */
+    const lx = sx < c.pad + 40 ? sx + 12 : sx + 10;
+    s += `<text class="pt-l" x="${lx}" y="${sy - 8}">(${pt.x}, ${n(pt.y)})</text>`;
+  });
+
+  /* ── ghost elements (hidden by default) ── */
+  s += `<circle id="gh-c" class="gh-c" r="9" style="display:none" data-dx="" data-dy=""/>
+        <rect   id="gh-b" class="gh-b" style="display:none" rx="4"/>
+        <text   id="gh-t" class="gh-t" style="display:none"/>`;
+
+  s += `</svg>`;
+
+  const wrap = $('#svg-wrap');
+  wrap.innerHTML = s;
+
+  const svg = $('#svg-el');
+  svg.addEventListener('mousemove', onMove);
+  svg.addEventListener('click', onClick);
+  svg.addEventListener('mouseleave', clearGhost);
+  svg.addEventListener('keydown', e => {
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (document.activeElement?.classList.contains('pt-c')) {
+        e.preventDefault();
+        const idx = +document.activeElement.dataset.idx;
+        if (!isNaN(idx)) { G.p2.plotted.splice(idx, 1); renderSVG(); }
       }
-    };
-
-    const graph = {
-      left: 70,
-      right: 520,
-      top: 35,
-      bottom: 275,
-      width: 450,
-      height: 240,
-      xMax: 5,
-      yMax: 25
-    };
-
-    const state = {
-      xp: 0,
-      streak: 0,
-      modelVerified: false,
-      challengeVerified: false,
-      debriefSubmitted: false,
-      currentInput: 1,
-      scenario: null
-    };
-
-    const el = {
-      slider: document.getElementById('light-slider'),
-      minusBtn: document.getElementById('minus-btn'),
-      plusBtn: document.getElementById('plus-btn'),
-      barFill: document.getElementById('bar-fill'),
-      lightBadge: document.getElementById('light-badge'),
-      currentPointText: document.getElementById('current-point-text'),
-      sidebarSummary: document.getElementById('sidebar-summary'),
-      talkX: document.getElementById('talk-x'),
-      talkY: document.getElementById('talk-y'),
-      talkPoint: document.getElementById('talk-point'),
-      xpPill: document.getElementById('xp-pill'),
-      streakPill: document.getElementById('streak-pill'),
-      masteryPill: document.getElementById('mastery-pill'),
-      graphStatus: document.getElementById('graph-status'),
-      relationLine: document.getElementById('relation-line'),
-      gridLayer: document.getElementById('grid-layer'),
-      activePoint: document.getElementById('active-point'),
-      pointLabel: document.getElementById('point-label'),
-      pointLabelBg: document.getElementById('point-label-bg'),
-      ghostGuide: document.getElementById('ghost-guide'),
-      announcer: document.getElementById('live-graph-announcer'),
-      checkModelBtn: document.getElementById('check-model-btn'),
-      jumpModel: document.getElementById('jump-model'),
-      jumpChallenge: document.getElementById('jump-challenge'),
-      resetBtn: document.getElementById('reset-btn'),
-      missionExplore: document.getElementById('mission-explore'),
-      missionVerify: document.getElementById('mission-verify'),
-      missionDebrief: document.getElementById('mission-debrief'),
-      crumbExplore: document.getElementById('crumb-explore'),
-      crumbQuiz: document.getElementById('crumb-quiz'),
-      crumbDebrief: document.getElementById('crumb-debrief'),
-      scenarioTitle: document.getElementById('scenario-title'),
-      scenarioText: document.getElementById('scenario-text'),
-      ansRate: document.getElementById('ans-rate'),
-      ansTotal: document.getElementById('ans-total'),
-      ansLimit: document.getElementById('ans-limit'),
-      ansVariable: document.getElementById('ans-variable'),
-      checkChallengeBtn: document.getElementById('check-challenge-btn'),
-      newScenarioBtn: document.getElementById('new-scenario-btn'),
-      debriefPanel: document.getElementById('debrief-panel'),
-      verifiedReview: document.getElementById('verified-review'),
-      kernelResponse: document.getElementById('kernel-response'),
-      submitKernelBtn: document.getElementById('submit-kernel-btn'),
-      clearKernelBtn: document.getElementById('clear-kernel-btn'),
-      toast: document.getElementById('toast')
-    };
-
-    function showToast(message, type = 'success') {
-      el.toast.textContent = message;
-      el.toast.className = `toast is-show ${type}`;
-      clearTimeout(showToast._timer);
-      showToast._timer = setTimeout(() => {
-        el.toast.className = 'toast';
-      }, 2600);
     }
+  });
 
-    function addXp(amount) {
-      state.xp += amount;
-      el.xpPill.innerHTML = `XP: <strong>${state.xp}</strong>`;
-      try {
-        localStorage.setItem('variableCityAdvancedXP', String(state.xp));
-      } catch (err) {
-        console.warn('Local storage unavailable.', err);
-        showToast('Progress saved for this session only.', 'error');
-      }
+  updatePlotCount();
+}
+
+function getSVGCoords(e) {
+  const c = G.p2.cfg;
+  const rect = $('#svg-el').getBoundingClientRect();
+  /* Scale rendered pixels → viewBox pixels */
+  const scaleX = c.W / rect.width, scaleY = c.H / rect.height;
+  const px = (e.clientX - rect.left) * scaleX;
+  const py = (e.clientY - rect.top)  * scaleY;
+  return { px, py };
+}
+
+function onMove(e) {
+  const c = G.p2.cfg;
+  const { px, py } = getSVGCoords(e);
+  const inGraph = px >= c.pad && px <= c.W - c.pad && py >= c.pad && py <= c.H - c.pad;
+
+  if (!inGraph) { clearGhost(); return; }
+
+  const dx = Math.round(toDx(px, c));
+  const dy = Math.round(toDy(py, c) / c.snap) * c.snap;
+
+  if (dx < 0 || dx > c.xMax || dy < 0 || dy > c.yMax) { clearGhost(); return; }
+
+  const sx = toSx(dx, c), sy = toSy(dy, c);
+  const lbl = `(${dx}, ${n(dy)})`;
+  const bw = lbl.length * 7.2 + 12;
+  /* keep tooltip below the point if near top edge */
+  const tipY = sy < 40 ? sy + 30 : sy - 14;
+  const tipAnchorY = sy < 40 ? sy + 44 : sy - 1;
+
+  const gh = $('#gh-c');
+  gh.setAttribute('cx', sx); gh.setAttribute('cy', sy);
+  gh.dataset.dx = dx; gh.dataset.dy = dy;
+  gh.style.display = 'block';
+
+  const gb = $('#gh-b');
+  gb.setAttribute('x', sx - bw / 2); gb.setAttribute('y', tipY - 14);
+  gb.setAttribute('width', bw); gb.setAttribute('height', 20);
+  gb.style.display = 'block';
+
+  const gt = $('#gh-t');
+  gt.setAttribute('x', sx); gt.setAttribute('y', tipY);
+  gt.textContent = lbl;
+  gt.style.display = 'block';
+
+  const cb = $('#coord-bar');
+  cb.textContent = `Preview: (${dx}, ${n(dy)}) — click to plot`;
+  cb.classList.add('active');
+}
+
+function clearGhost() {
+  ['#gh-c','#gh-b','#gh-t'].forEach(id => {
+    const el = $(id); if (el) el.style.display = 'none';
+  });
+  const cb = $('#coord-bar');
+  if (cb) { cb.textContent = 'Hover over the graph to preview a point'; cb.classList.remove('active'); }
+}
+
+function onClick(e) {
+  const target = e.target;
+  /* Remove existing point */
+  if (target.classList.contains('pt-c')) {
+    const idx = +target.dataset.idx;
+    if (!isNaN(idx)) { G.p2.plotted.splice(idx, 1); renderSVG(); }
+    return;
+  }
+  /* Plot from ghost */
+  const gh = $('#gh-c');
+  if (!gh || gh.style.display !== 'block') return;
+  const dx = parseInt(gh.dataset.dx, 10);
+  const dy = parseInt(gh.dataset.dy, 10);
+  if (G.p2.plotted.some(p => p.x === dx && p.y === dy)) return;
+  if (G.p2.plotted.length >= G.p2.data.length) {
+    toast('Remove a point before adding another.', false);
+    return;
+  }
+  G.p2.plotted.push({ x: dx, y: dy });
+  renderSVG();
+}
+
+function updatePlotCount() {
+  const el = $('#plot-n');
+  if (el) el.textContent = G.p2.plotted.length;
+}
+
+function checkP2() {
+  withCheck(() => {
+    if (G.p2.plotted.length !== G.p2.data.length) {
+      toast(`Plot all ${G.p2.data.length} points from the table first.`, false);
+      return;
     }
-
-    function setStreak(value) {
-      state.streak = value;
-      el.streakPill.innerHTML = `Streak: <strong>${state.streak}</strong>`;
+    const correct = G.p2.plotted.filter(p =>
+      G.p2.data.some(d => d.x === p.x && d.y === p.y)
+    ).length;
+    if (correct === G.p2.data.length) {
+      award(300, true);
+      toast('All 4 points correct! ✓', true);
+      setTimeout(() => { switchPhase(3); initP3(); }, 1300);
+    } else {
+      award(0, false);
+      toast(`${correct} of ${G.p2.data.length} points match the table.`, false);
     }
+  });
+}
 
-    function pointToGraph(x, y) {
-      const px = graph.left + ((x - 0) / graph.xMax) * graph.width;
-      const py = graph.bottom - ((y - 0) / graph.yMax) * graph.height;
-      return { px, py };
-    }
+/* ════════════════════════════════════════════════════
+   PHASE 3 — SOLVE & DISCUSS
+════════════════════════════════════════════════════ */
+const SCENARIOS = [
+  {
+    ctx: 'Science Museum Tickets',
+    item: 'ticket', items: 'tickets', verb: 'costs',
+    depLabel: 'Total Cost', indLabel: 'Number of tickets',
+    unit: '$', min: 18, max: 32
+  },
+  {
+    ctx: 'Robotics Club Savings',
+    item: 'week', items: 'weeks', verb: 'adds',
+    depLabel: 'Total Savings', indLabel: 'Number of weeks',
+    unit: '$', min: 24, max: 48
+  },
+  {
+    ctx: 'Research Drone Travel',
+    item: 'minute', items: 'minutes', verb: 'covers',
+    depLabel: 'Total Distance', indLabel: 'Number of minutes',
+    unit: 'ft', min: 720, max: 1440
+  }
+];
 
-    function buildGrid() {
-      const parts = [];
-      for (let x = 0; x <= graph.xMax; x++) {
-        const px = graph.left + (x / graph.xMax) * graph.width;
-        parts.push(`<line x1="${px}" y1="${graph.top}" x2="${px}" y2="${graph.bottom}" stroke="#E6EFEC" stroke-width="1"></line>`);
-        if (x > 0) {
-          parts.push(`<text x="${px}" y="${graph.bottom + 22}" text-anchor="middle" font-size="12" font-weight="700" fill="#50636A">${x}</text>`);
-        }
-      }
-      for (let y = 0; y <= graph.yMax; y += 5) {
-        const py = graph.bottom - (y / graph.yMax) * graph.height;
-        parts.push(`<line x1="${graph.left}" y1="${py}" x2="${graph.right}" y2="${py}" stroke="#E6EFEC" stroke-width="1"></line>`);
-        if (y > 0) {
-          parts.push(`<text x="${graph.left - 10}" y="${py + 4}" text-anchor="end" font-size="12" font-weight="700" fill="#50636A">${y}</text>`);
-        }
-      }
-      el.gridLayer.innerHTML = parts.join('');
-    }
+function initP3() {
+  $('#debrief').style.display = 'none';
+  $('#p3-footer').style.display = 'flex';
+  $$('.d-cb').forEach(cb => { cb.checked = false; });
+  checkDebriefReady();
+  generateScenario();
+}
 
-    function buildRelationLine() {
-      const points = [];
-      for (let x = RULE.minInput; x <= RULE.maxInput; x++) {
-        const y = RULE.output(x);
-        const { px, py } = pointToGraph(x, y);
-        points.push(`${px},${py}`);
-      }
-      el.relationLine.setAttribute('points', points.join(' '));
-    }
+function generateScenario() {
+  const t = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+  const rate    = Math.floor(Math.random() * (t.max - t.min + 1)) + t.min;
+  const qN      = Math.floor(Math.random() * 5) + 5;   /* 5–9 */
+  const total   = rate * qN;
+  const limitN  = qN - 2;
+  const limitTotal = rate * limitN;
+  const nextTotal  = rate * (limitN + 1);
 
-    function updateModel(inputValue) {
-      const x = Number(inputValue);
-      const y = RULE.output(x);
-      state.currentInput = x;
+  G.p3.cur = { t, rate, qN, total, limitN, limitTotal, nextTotal };
 
-      const barHeight = (y / graph.yMax) * 250;
-      document.documentElement.style.setProperty('--bar-h', `${barHeight}px`);
+  renderScenario();
+  renderInputs();
+  renderDiscQs();
+  $('#v-grid').innerHTML = '';
+  $('#debrief').style.display = 'none';
+  $('#p3-footer').style.display = 'flex';
+  $$('.d-cb').forEach(cb => { cb.checked = false; });
+  checkDebriefReady();
+}
 
-      el.lightBadge.textContent = `x = ${x} ${x === 1 ? 'unit' : 'units'}`;
-      el.currentPointText.textContent = `(${x}, ${y})`;
-      el.sidebarSummary.textContent = `${x} ${x === 1 ? 'light unit gives' : 'light units give'} a height of ${y} centimeters.`;
-      el.talkX.textContent = x;
-      el.talkY.textContent = y;
-      el.talkPoint.textContent = `(${x}, ${y})`;
+function renderScenario() {
+  const { t, rate, qN, limitTotal } = G.p3.cur;
+  const rateStr  = fv(t, rate);
+  const limitStr = fv(t, limitTotal);
+  $('#p3-scenario').innerHTML = `
+    <div class="sc-eyebrow">${t.ctx}</div>
+    <div class="sc-rate-line">Each ${t.item} ${t.verb} <em>${rateStr}</em></div>
+    <div class="sc-tasks">
+      <div class="sc-task">
+        <div class="sc-task-n">1</div>
+        <div>What is the total for <strong>${qN} ${t.items}</strong>?</div>
+      </div>
+      <div class="sc-task">
+        <div class="sc-task-n">2</div>
+        <div>What is the maximum number of ${t.items} within <strong>${limitStr}</strong>?</div>
+      </div>
+      <div class="sc-task">
+        <div class="sc-task-n">3</div>
+        <div>Which quantity is the <strong>dependent variable</strong>?</div>
+      </div>
+    </div>`;
+}
 
-      const { px, py } = pointToGraph(x, y);
-      el.activePoint.setAttribute('cx', px);
-      el.activePoint.setAttribute('cy', py);
+function renderInputs() {
+  const { t, rate, qN, limitTotal } = G.p3.cur;
+  const pre = t.unit === '$' ? '$' : '';
+  const suf = t.unit !== '$' ? ` ${t.unit}` : '';
+  const limitStr = fv(t, limitTotal);
 
-      el.pointLabel.textContent = `(${x}, ${y})`;
-      el.pointLabel.setAttribute('x', px);
-      el.pointLabel.setAttribute('y', py - 16);
+  $('#p3-inputs').innerHTML = `
+    <div class="answer-row">
+      <div class="ans-lbl">
+        Rate per ${t.item}
+        <span class="hint">How much does 1 ${t.item} ${t.verb}?</span>
+      </div>
+      <div class="ans-inp-group">
+        <span class="ans-pre">${pre}</span>
+        <input type="number" id="in-rate" class="ans-input"
+               aria-label="Rate per ${t.item}" placeholder="0" min="0"/>
+        <span class="ans-suf">${suf}</span>
+      </div>
+    </div>
+    <div class="answer-row">
+      <div class="ans-lbl">
+        Total for ${qN} ${t.items}
+        <span class="hint">Multiply: rate × ${qN}</span>
+      </div>
+      <div class="ans-inp-group">
+        <span class="ans-pre">${pre}</span>
+        <input type="number" id="in-total" class="ans-input"
+               aria-label="Total for ${qN} ${t.items}" placeholder="0" min="0"/>
+        <span class="ans-suf">${suf}</span>
+      </div>
+    </div>
+    <div class="answer-row">
+      <div class="ans-lbl">
+        Max ${t.items} within ${limitStr}
+        <span class="hint">How many fit without going over?</span>
+      </div>
+      <div class="ans-inp-group">
+        <input type="number" id="in-max" class="ans-input" style="width:70px"
+               aria-label="Maximum ${t.items}" placeholder="0" min="0"/>
+        <span class="ans-suf"> ${t.items}</span>
+      </div>
+    </div>
+    <div class="answer-row">
+      <div class="ans-lbl">
+        Dependent variable
+        <span class="hint">Which quantity changes because of the other?</span>
+      </div>
+      <div class="ans-inp-group">
+        <select id="in-dep" class="ans-select" aria-label="Select the dependent variable">
+          <option value="">— Choose —</option>
+          <option value="dep">${t.depLabel}</option>
+          <option value="ind">${t.indLabel}</option>
+        </select>
+      </div>
+    </div>`;
+}
 
-      const labelWidth = 74;
-      el.pointLabelBg.setAttribute('x', px - labelWidth / 2);
-      el.pointLabelBg.setAttribute('y', py - 34);
-      el.pointLabelBg.setAttribute('width', labelWidth);
-      el.pointLabelBg.setAttribute('height', 24);
+function renderDiscQs() {
+  const { t, rate, qN, total, limitN, limitTotal, nextTotal } = G.p3.cur;
 
-      const stageX = 116;
-      const stageY = 290 - barHeight;
-      el.ghostGuide.setAttribute('x1', stageX);
-      el.ghostGuide.setAttribute('y1', stageY);
-      el.ghostGuide.setAttribute('x2', px);
-      el.ghostGuide.setAttribute('y2', py);
+  $('#dq1').textContent =
+    `Partner A explains: Why is "${t.depLabel}" the dependent variable? ` +
+    `What does it depend on, and how do you know?`;
 
-      el.slider.setAttribute('aria-valuetext', `${x} light ${x === 1 ? 'unit' : 'units'} produces a plant height of ${y} centimeters`);
-      el.announcer.textContent = `Graph updated: ${x} ${x === 1 ? 'unit' : 'units'} equals ${y} centimeters. Point ${x}, ${y}.`;
+  $('#dq2').textContent =
+    `Partner B explains: You said the maximum is ${limitN} ${t.items}. ` +
+    `What would ${limitN + 1} ${t.items} ${t.verb === 'costs' ? 'cost' : 'total'} ` +
+    `(${fv(t, nextTotal)})? Why does that break the limit of ${fv(t, limitTotal)}?`;
+}
 
-      if (!state.modelVerified) {
-        el.graphStatus.textContent = `System Status: You are exploring the ordered pair (${x}, ${y}). Explain why this point belongs on the line y = 5x.`;
-      }
-    }
+function checkP3() {
+  withCheck(() => {
+    const { t, rate, total, limitN } = G.p3.cur;
+    const r   = +($('#in-rate')?.value ?? NaN);
+    const tot = +($('#in-total')?.value ?? NaN);
+    const mx  = +($('#in-max')?.value  ?? NaN);
+    const dep = $('#in-dep')?.value;
 
-    function celebrateModel() {
-      state.modelVerified = true;
-      addXp(120);
-      setStreak(state.streak + 1);
-      el.graphStatus.textContent = 'Model Verified: You correctly connected the input, output, and graph point.';
-      el.graphStatus.classList.add('is-correct');
-      el.masteryPill.innerHTML = 'Mission: <strong>Verify</strong>';
-      el.crumbExplore.classList.remove('is-active');
-      el.crumbQuiz.classList.add('is-active');
-      el.missionExplore.classList.add('is-done');
-      pulseMastery();
-      showToast('Model verified. Move to the challenge.', 'success');
-    }
+    const allCorrect = r === rate && tot === total && mx === limitN && dep === 'dep';
 
-    function pulseMastery() {
-      document.documentElement.style.setProperty('--celebrate-scale', '1.05');
-      setTimeout(() => document.documentElement.style.setProperty('--celebrate-scale', '1'), 260);
-    }
+    if (allCorrect) {
+      award(550, true);
+      toast('All answers correct! ✓', true);
 
-    function checkModel() {
-      const x = state.currentInput;
-      const y = RULE.output(x);
-      if (RULE.inverse(y) === x) {
-        celebrateModel();
-      } else {
-        setStreak(0);
-        showToast('Check the relationship again.', 'error');
-      }
-    }
-
-    function scrollToSection(id) {
-      document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function bindMissionButtons() {
-      [el.missionExplore, el.missionVerify, el.missionDebrief].forEach((button) => {
-        button.addEventListener('click', () => scrollToSection(button.dataset.target));
+      /* Lock inputs */
+      ['#in-rate','#in-total','#in-max'].forEach(id => {
+        const el = $(id); if (el) el.classList.add('correct');
       });
+      const sel = $('#in-dep'); if (sel) sel.classList.add('correct');
+
+      /* Build verified answers grid */
+      const { qN, limitTotal } = G.p3.cur;
+      $('#v-grid').innerHTML = `
+        <div class="v-item">
+          <div class="v-lbl">Rate per ${t.item}</div>
+          <div class="v-val">${fv(t, rate)}</div>
+        </div>
+        <div class="v-item">
+          <div class="v-lbl">Total (${qN} ${t.items})</div>
+          <div class="v-val">${fv(t, total)}</div>
+        </div>
+        <div class="v-item">
+          <div class="v-lbl">Max within ${fv(t, limitTotal)}</div>
+          <div class="v-val">${limitN} ${t.items}</div>
+        </div>
+        <div class="v-item">
+          <div class="v-lbl">Dependent variable</div>
+          <div class="v-val">${t.depLabel}</div>
+        </div>`;
+
+      $('#p3-footer').style.display = 'none';
+      setTimeout(() => {
+        $('#debrief').style.display = 'block';
+        $('#debrief').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 350);
+    } else {
+      award(0, false);
+      const errs = [];
+      if (r !== rate)     errs.push('rate');
+      if (tot !== total)  errs.push('total');
+      if (mx !== limitN)  errs.push('maximum');
+      if (dep !== 'dep')  errs.push('dependent variable');
+      toast(`Check: ${errs.join(', ')}.`, false);
     }
+  });
+}
 
-    function randomFrom(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
+function checkDebriefReady() {
+  const both = $('#dc1')?.checked && $('#dc2')?.checked;
+  const btn = $('#btn-next');
+  if (!btn) return;
+  btn.disabled = !both;
+  btn.className = both ? 'btn btn-coral' : 'btn btn-teal';
+}
 
-    function buildScenario() {
-      const bank = [
-        {
-          title: 'Robotics Supply Packs',
-          unit: 'pack',
-          units: 'packs',
-          outputLabel: 'total cost',
-          symbol: '$',
-          rateMin: 14,
-          rateMax: 24,
-          limitOffset: 2
-        },
-        {
-          title: 'Museum Shuttle Trips',
-          unit: 'trip',
-          units: 'trips',
-          outputLabel: 'total distance',
-          symbol: '',
-          unitSuffix: ' miles',
-          rateMin: 18,
-          rateMax: 30,
-          limitOffset: 2
-        },
-        {
-          title: 'Studio Recording Sessions',
-          unit: 'session',
-          units: 'sessions',
-          outputLabel: 'total fee',
-          symbol: '$',
-          rateMin: 22,
-          rateMax: 36,
-          limitOffset: 2
-        }
-      ];
+/* ════════════════════════════════════════════════════
+   EVENTS
+════════════════════════════════════════════════════ */
+function bindEvents() {
 
-      const type = randomFrom(bank);
-      const rate = Math.floor(Math.random() * (type.rateMax - type.rateMin + 1)) + type.rateMin;
-      const amount = Math.floor(Math.random() * 4) + 5;
-      const total = rate * amount;
-      const greatest = amount - type.limitOffset;
-      const limit = greatest * rate;
-      const nextTotal = (greatest + 1) * rate;
+  /* Boot: mode cards */
+  $$('[data-mode]').forEach(card => {
+    const start = () => {
+      G.mode = card.dataset.mode;
+      $('#hud-protocol').textContent = G.mode === 'coop' ? 'Partner Mode' : 'Individual';
+      const boot = $('#boot');
+      boot.style.opacity = '0';
+      setTimeout(() => {
+        boot.style.display = 'none';
+        initP1();
+        switchPhase(1);
+      }, 460);
+    };
+    card.addEventListener('click', start);
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(); }
+    });
+  });
 
-      state.scenario = { type, rate, amount, total, greatest, limit, nextTotal };
+  /* Co-op modal */
+  $$('[data-coop]').forEach(btn => {
+    btn.addEventListener('click', () => closeModal(btn.dataset.coop === 'go'));
+  });
 
-      const limitText = type.symbol
-        ? `${type.symbol}${limit}`
-        : `${limit}${type.unitSuffix || ''}`;
+  /* Phase check buttons */
+  $('#btn-p1').addEventListener('click', checkP1);
+  $('#btn-p2').addEventListener('click', checkP2);
+  $('#btn-p3').addEventListener('click', checkP3);
 
-      const totalText = type.symbol
-        ? `${type.symbol}${total}`
-        : `${total}${type.unitSuffix || ''}`;
-
-      el.scenarioTitle.textContent = type.title;
-      el.scenarioText.textContent =
-        `Each ${type.unit} has a constant rate of ${type.symbol}${rate}${type.unitSuffix || ''}. ` +
-        `Find the total for ${amount} ${type.units}. Then determine the greatest number of ${type.units} that stays at or below ${limitText}. ` +
-        `Finally, identify the dependent variable in the relationship. Expected total for the given amount: ${totalText}.`;
-
-      el.ansRate.value = '';
-      el.ansTotal.value = '';
-      el.ansLimit.value = '';
-      el.ansVariable.value = '';
-      el.kernelResponse.value = '';
-      el.debriefPanel.hidden = true;
-      state.challengeVerified = false;
-      state.debriefSubmitted = false;
-    }
-
-    function verifyChallenge() {
-      const s = state.scenario;
-      if (!s) return;
-
-      const rate = Number(el.ansRate.value);
-      const total = Number(el.ansTotal.value);
-      const greatest = Number(el.ansLimit.value);
-      const dep = el.ansVariable.value;
-
-      const ok = rate === s.rate && total === s.total && greatest === s.greatest && dep === 'dep';
-
-      if (!ok) {
-        setStreak(0);
-        showToast('Revise the rate, total, limit, or variable choice.', 'error');
-        return;
+  /* Debrief checkboxes */
+  $$('.d-cb').forEach(cb => {
+    cb.addEventListener('change', checkDebriefReady);
+  });
+  /* Clicking the whole disc-check row (not the input or label) */
+  $$('.disc-check').forEach(wrap => {
+    wrap.addEventListener('click', e => {
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') {
+        const cb = wrap.querySelector('.d-cb');
+        if (cb) { cb.checked = !cb.checked; checkDebriefReady(); }
       }
+    });
+  });
 
-      state.challengeVerified = true;
-      addXp(180);
-      setStreak(state.streak + 1);
-      el.masteryPill.innerHTML = 'Mission: <strong>Debrief</strong>';
-      el.crumbQuiz.classList.remove('is-active');
-      el.crumbDebrief.classList.add('is-active');
-      el.missionVerify.classList.add('is-done');
-      el.verifiedReview.textContent =
-        `Verified: the rate is ${s.type.symbol}${s.rate}${s.type.unitSuffix || ''} per ${s.type.unit}; ` +
-        `the total for ${s.amount} ${s.type.units} is ${s.type.symbol}${s.total}${s.type.unitSuffix || ''}; ` +
-        `the greatest number that stays within the limit is ${s.greatest} because ${s.greatest + 1} would produce ` +
-        `${s.type.symbol}${s.nextTotal}${s.type.unitSuffix || ''}, which is too large. The dependent variable is the total output.`;
+  /* Next problem */
+  $('#btn-next').addEventListener('click', initP3);
+}
 
-      el.debriefPanel.hidden = false;
-      pulseMastery();
-      showToast('Challenge verified. Write the explanation to complete the cycle.', 'success');
-      el.kernelResponse.focus();
-    }
-
-    function submitKernel() {
-      if (!state.challengeVerified) {
-        showToast('Verify the challenge first.', 'error');
-        return;
-      }
-
-      const text = el.kernelResponse.value.trim();
-      const s = state.scenario;
-
-      const hasLength = text.length >= 80;
-      const includesInput = text.includes(String(s.amount)) || text.includes(String(s.greatest));
-      const includesOutput = text.includes(String(s.total)) || text.includes(String(s.limit));
-      const mentionsDependent = /dependent/i.test(text);
-
-      if (!(hasLength && includesInput && includesOutput && mentionsDependent)) {
-        showToast('Use a complete explanation with your actual values and the term dependent variable.', 'error');
-        return;
-      }
-
-      state.debriefSubmitted = true;
-      addXp(220);
-      setStreak(state.streak + 1);
-      el.missionDebrief.classList.add('is-done');
-      pulseMastery();
-      showToast('Explanation submitted. Mission complete.', 'success');
-    }
-
-    function resetSession() {
-      state.xp = 0;
-      state.streak = 0;
-      state.modelVerified = false;
-      state.challengeVerified = false;
-      state.debriefSubmitted = false;
-      el.xpPill.innerHTML = 'XP: <strong>0</strong>';
-      el.streakPill.innerHTML = 'Streak: <strong>0</strong>';
-      el.masteryPill.innerHTML = 'Mission: <strong>Explore</strong>';
-      el.graphStatus.textContent = 'System Status: Explore the relationship. Then predict, verify, and explain the pattern.';
-      el.graphStatus.classList.remove('is-correct');
-      [el.missionExplore, el.missionVerify, el.missionDebrief].forEach(btn => btn.classList.remove('is-done'));
-      el.crumbExplore.classList.add('is-active');
-      el.crumbQuiz.classList.remove('is-active');
-      el.crumbDebrief.classList.remove('is-active');
-      el.slider.value = '1';
-      updateModel(1);
-      buildScenario();
-      try {
-        localStorage.removeItem('variableCityAdvancedXP');
-      } catch (err) {
-        console.warn(err);
-      }
-      showToast('Session reset.', 'success');
-      scrollToSection('top');
-    }
-
-    function wireEvents() {
-      el.slider.addEventListener('input', (e) => updateModel(e.target.value));
-      el.minusBtn.addEventListener('click', () => {
-        const next = Math.max(RULE.minInput, Number(el.slider.value) - 1);
-        el.slider.value = String(next);
-        updateModel(next);
-      });
-      el.plusBtn.addEventListener('click', () => {
-        const next = Math.min(RULE.maxInput, Number(el.slider.value) + 1);
-        el.slider.value = String(next);
-        updateModel(next);
-      });
-
-      el.checkModelBtn.addEventListener('click', checkModel);
-      el.checkChallengeBtn.addEventListener('click', verifyChallenge);
-      el.newScenarioBtn.addEventListener('click', buildScenario);
-      el.submitKernelBtn.addEventListener('click', submitKernel);
-      el.clearKernelBtn.addEventListener('click', () => el.kernelResponse.value = '');
-
-      el.jumpModel.addEventListener('click', () => scrollToSection('model-section'));
-      el.jumpChallenge.addEventListener('click', () => scrollToSection('challenge-section'));
-      el.resetBtn.addEventListener('click', resetSession);
-
-      bindMissionButtons();
-    }
-
-    function restoreProgress() {
-      try {
-        const stored = Number(localStorage.getItem('variableCityAdvancedXP'));
-        if (Number.isFinite(stored) && stored > 0) {
-          state.xp = stored;
-          el.xpPill.innerHTML = `XP: <strong>${stored}</strong>`;
-        }
-      } catch (err) {
-        console.warn('Could not restore local storage.', err);
-      }
-    }
-
-    function init() {
-      buildGrid();
-      buildRelationLine();
-      restoreProgress();
-      wireEvents();
-      updateModel(1);
-      buildScenario();
-    }
-
-    init();
-  </script>
+/* ════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  bindEvents();
+  updateHUD();
+});
+</script>
 </body>
 </html>
